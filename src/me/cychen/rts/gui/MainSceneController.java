@@ -5,6 +5,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextFlow;
@@ -13,6 +14,7 @@ import me.cychen.rts.event.SchedulerIntervalEvent;
 import me.cychen.rts.framework.Task;
 import me.cychen.rts.gui.trace.TraceController;
 import me.cychen.util.ProgMsg;
+import me.cychen.util.connect.SerialConnection;
 
 public class MainSceneController {
     @FXML
@@ -21,9 +23,13 @@ public class MainSceneController {
     public Button leftControlPaneFoldingButton;
     public VBox vboxTraceContent;
     public VBox vboxTraceHeads;
+    public TextField textFieldSerialPortName;
+    public Button btnStartStop;
 
     /* local variables */
-    Boolean stopTraceUpdaterThread = false;
+    Boolean stopSerialConnectionThread = false;
+    Boolean isSerialConnectionThreadStopped = true;
+    SerialConnection serialConnection;
     TimeLine globalTimeLine = new TimeLine();
     TraceController traceController = new TraceController(globalTimeLine);
 
@@ -47,6 +53,8 @@ public class MainSceneController {
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
         //timeline.stop();
+
+        //AnimationTimer
     }
 
     @FXML
@@ -60,6 +68,55 @@ public class MainSceneController {
             leftControlPaneFoldingButton.setText(">");
             leftControlPane.setPrefWidth(0);
             leftControlPane.setVisible(false);
+        }
+    }
+
+    @FXML
+    private void startStopSerialPortReceiver() {
+        if (btnStartStop.getText().toLowerCase() == "start") {
+            stopSerialPortReceiver();
+
+            // The button should be changed by the thread when it is really terminated.
+            //btnStartStop.setText("Stop");
+        } else {
+            if (startSerialPortReceiver()) {
+                btnStartStop.setText("Start");
+            }
+        }
+    }
+
+    private Boolean startSerialPortReceiver() {
+        /* If the serial object is not empty (activated before), then try to close it. */
+        if (serialConnection!=null) {
+            serialConnection.close();
+        }
+
+        try {
+            serialConnection = new SerialConnection(textFieldSerialPortName.getText());
+            new Thread(new SerialConnectionThread()).start();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private void stopSerialPortReceiver() {
+        stopSerialConnectionThread = true;
+        // Note that the
+    }
+
+    private class SerialConnectionThread implements Runnable {
+
+        @Override
+        public void run() {
+            isSerialConnectionThreadStopped = false;
+            while (stopSerialConnectionThread == false) {
+                ProgMsg.putLine(serialConnection.read());
+            }
+            serialConnection.close();
+            isSerialConnectionThreadStopped = true;
+            btnStartStop.setText("Stop");
         }
     }
 
