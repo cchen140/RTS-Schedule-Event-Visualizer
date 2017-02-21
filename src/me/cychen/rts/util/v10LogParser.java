@@ -1,6 +1,9 @@
 package me.cychen.rts.util;
 
 import me.cychen.rts.event.EventContainer;
+import me.cychen.rts.event.InstantEvent;
+import me.cychen.rts.event.TaskInstantEvent;
+import me.cychen.rts.framework.Task;
 import me.cychen.rts.framework.TaskSet;
 import me.cychen.util.ProgMsg;
 
@@ -10,7 +13,7 @@ import java.io.IOException;
 /**
  * Created by CY on 2/13/17.
  */
-public class v10LogParser implements LogParser {
+public class V10LogParser implements LogParser {
     public static final int PARSER_VERSION = 10;
 
     private static final int LOG_BLOCK_UNKNOWN = 0;
@@ -24,6 +27,10 @@ public class v10LogParser implements LogParser {
     private long firstTimestamp = -1;
     private EventContainer eventContainer = new EventContainer();
     private TaskSet taskSet = new TaskSet();
+
+    public void setTaskSet(TaskSet taskSet) {
+        this.taskSet = taskSet;
+    }
 
     @Override
     public int getParserVersion() {
@@ -217,4 +224,25 @@ public class v10LogParser implements LogParser {
 //        // Incorrect task list log format.
 //        return false;
 //    }
+
+    public TaskInstantEvent parseSerialLogString(String inString) {
+        String splitStrings[] = inString.split(",");
+        if (splitStrings.length == 4) {
+            long timeStamp = Double.valueOf(splitStrings[0].trim()).intValue();
+            int eventTaskId = Integer.valueOf(splitStrings[1].trim()).intValue();
+            int eventData = Integer.valueOf(splitStrings[2].trim()).intValue();
+            String eventString = splitStrings[3].trim().substring(1, splitStrings[3].trim().length() - 1);
+
+            Task thisTask = taskSet.getTaskById(eventTaskId);
+            if (thisTask == null) {
+                taskSet.addTask(eventTaskId, "", Task.TASK_TYPE_APP, 0, 0, 0, 0);
+                thisTask = taskSet.getTaskById(eventTaskId);
+            }
+
+            return new TaskInstantEvent(timeStamp, thisTask, eventData, eventString);
+
+        } else {
+            return null;
+        }
+    }
 }

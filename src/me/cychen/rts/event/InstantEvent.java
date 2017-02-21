@@ -3,7 +3,7 @@ package me.cychen.rts.event;
 /**
  * Created by jjs on 2/13/17.
  */
-public class InstantEvent {
+public class InstantEvent extends Event {
     protected long orgTimestamp = 0;
     protected long scaledTimestamp = 0;
 

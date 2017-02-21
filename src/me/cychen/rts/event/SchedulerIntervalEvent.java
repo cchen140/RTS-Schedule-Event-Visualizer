@@ -12,8 +12,15 @@ public class SchedulerIntervalEvent extends IntervalEvent {
     {
         orgBeginTimestamp = inTimeStamp;
         scaledBeginTimestamp = inTimeStamp;
+
+        orgEndTimestamp = orgBeginTimestamp;
+        scaledEndTimestamp = orgEndTimestamp;
+
         task = inTask;
         note = inNote;
+
+        // Since the end time is not specified, it is an incomplete event.
+        eventCompleted = false;
     }
 
     public SchedulerIntervalEvent(long inBeginTimeStamp, long inEndTimeStamp, Task inTask, String inNote)
@@ -21,8 +28,14 @@ public class SchedulerIntervalEvent extends IntervalEvent {
         this(inBeginTimeStamp, inTask, inNote);
         orgEndTimestamp = inEndTimeStamp;
         scaledEndTimestamp = inEndTimeStamp;
+
+        eventCompleted = true;
     }
 
     public Task getTask() { return task; }
 
+    @Override
+    public String toString() {
+        return orgBeginTimestamp + "-" + orgEndTimestamp + ", " + task.getId() + ", " + note;
+    }
 }

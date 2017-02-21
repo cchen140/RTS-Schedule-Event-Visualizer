@@ -11,6 +11,7 @@ import me.cychen.rts.gui.TimeLine;
 public class BaseLinePane extends Pane {
     Line baseLine = new Line(0, 0, 0, 0);
 
+    private double offsetX = 0;
     private TimeLine globalTimeLine;
     //private double endTimestamp = 0;
 

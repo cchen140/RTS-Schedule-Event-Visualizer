@@ -3,13 +3,15 @@ package me.cychen.rts.event;
 /**
  * Created by jjs on 2/13/17.
  */
-public class IntervalEvent {
+public class IntervalEvent extends Event {
     //public static final int EVENT_SCHEDULER = 0;
     protected long orgBeginTimestamp = 0;
     protected long orgEndTimestamp = 0;
 
     protected long scaledBeginTimestamp = 0;
     protected long scaledEndTimestamp = 0;
+
+    public Boolean eventCompleted = true;
 
     protected String note = "";
     protected Boolean noteVisible = false;
@@ -24,6 +26,8 @@ public class IntervalEvent {
     public void setOrgEndTimestamp(long inputTimeStamp)
     {
         orgEndTimestamp = inputTimeStamp;
+        // TODO: scaled value should be handled separately.
+        scaledEndTimestamp = orgEndTimestamp;
     }
     public long getScaledEndTimestamp() { return scaledEndTimestamp; }
 
@@ -74,5 +78,11 @@ public class IntervalEvent {
 
     public long getScaledDuration() {
         return scaledEndTimestamp - scaledBeginTimestamp;
+    }
+
+    public void extendEnd(long inExtraLength) {
+        orgEndTimestamp += inExtraLength;
+        //TODO: How to deal with scaled timestamp here?
+        scaledEndTimestamp = orgEndTimestamp;
     }
 }

@@ -34,11 +34,11 @@ public class ColorList {
 
         for (int i = 0; i < len; ++i)
         {
-            int red = (int) (Math.sin(frequency1*i + phase1) * width + center);
-            int grn = (int) (Math.sin(frequency2*i + phase2) * width + center);
-            int blu = (int) (Math.sin(frequency3*i + phase3) * width + center);
+            double red = (Math.sin(frequency1*i + phase1) * width + center)/256.0;
+            double grn = (Math.sin(frequency2*i + phase2) * width + center)/256.0;
+            double blu = (Math.sin(frequency3*i + phase3) * width + center)/256.0;
             //todo: Check if 0 is applicable for the fourth parameter.
-            colorList.add(new Color(red, grn, blu, 0));
+            colorList.add(new Color(red, grn, blu, 1));
             //System.out.println(colorList.get(i).toString());
         }
     }

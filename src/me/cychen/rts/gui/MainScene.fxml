@@ -25,9 +25,9 @@
                   </ScrollPane>
                </top>
                <center>
-                  <ScrollPane fitToHeight="true" BorderPane.alignment="CENTER">
+                  <ScrollPane fx:id="scrollPaneTraceContent" fitToHeight="true" BorderPane.alignment="CENTER">
                      <content>
-                        <VBox fx:id="vboxTraceContent" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="50.0" spacing="5.0" style="-fx-background-color: red;" />
+                        <VBox fx:id="vboxTraceContent" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="50.0" spacing="5.0" style="-fx-background-color: white;" />
                      </content>
                   </ScrollPane>
                </center>
@@ -52,9 +52,6 @@
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
-                                 <children>
-                                    <CheckBox alignment="CENTER" mnemonicParsing="false" text="Task 1" GridPane.rowIndex="1" />
-                                 </children>
                               </GridPane>
                            </children>
                         </VBox>
@@ -81,7 +78,7 @@
             <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="242.0" spacing="5.0" GridPane.columnIndex="1">
                <children>
                   <Label text="Serial Port:" />
-                  <TextField fx:id="textFieldSerialPortName" prefWidth="100.0" />
+                  <ChoiceBox fx:id="choiceBoxSerialPortList" prefWidth="150.0" />
                   <Button fx:id="btnStartStop" alignment="CENTER" mnemonicParsing="false" onMouseClicked="#startStopSerialPortReceiver" text="Start" />
                </children>
             </HBox>
@@ -109,7 +106,7 @@
          <center>
             <BorderPane fx:id="leftControlPane" minWidth="0.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                <center>
-                  <ScrollPane minWidth="0.0" prefViewportHeight="160.0" prefViewportWidth="173.0">
+                  <ScrollPane fx:id="scrollPaneProgMsg" minWidth="0.0" prefViewportHeight="160.0" prefViewportWidth="173.0">
                      <content>
                         <TextFlow fx:id="textFlowProgMsg" BorderPane.alignment="CENTER" />
                      </content>

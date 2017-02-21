@@ -24,4 +24,8 @@ public class TaskInstantEvent extends InstantEvent {
 
     public Task getTask() { return task; }
 
+    @Override
+    public String toString() {
+        return orgTimestamp + ", " + task.getId() + ", " + note;
+    }
 }
