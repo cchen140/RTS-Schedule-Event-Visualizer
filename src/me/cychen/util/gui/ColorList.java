@@ -3,6 +3,7 @@ package me.cychen.util.gui;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by jjs on 2/13/17.
@@ -19,7 +20,8 @@ public class ColorList {
         final int width = 127;
         final double frequency = 2.4;
         colorList.clear();
-        generateColorList(frequency, frequency, frequency, 0, 2, 4, center, width, MAX_COLOR_LENGTH);
+        //generateColorList(frequency, frequency, frequency, 0, 2, 4, center, width, MAX_COLOR_LENGTH);
+        generateColorList(frequency, frequency, frequency, 1, 2, 4, center, width, MAX_COLOR_LENGTH);
         colorIndex = 0;
     }
 
@@ -37,7 +39,6 @@ public class ColorList {
             double red = (Math.sin(frequency1*i + phase1) * width + center)/256.0;
             double grn = (Math.sin(frequency2*i + phase2) * width + center)/256.0;
             double blu = (Math.sin(frequency3*i + phase3) * width + center)/256.0;
-            //todo: Check if 0 is applicable for the fourth parameter.
             colorList.add(new Color(red, grn, blu, 1));
             //System.out.println(colorList.get(i).toString());
         }
@@ -51,6 +52,14 @@ public class ColorList {
 
         colorIndex++;
         return colorList.get(colorIndex-1); // ArrayList index starts from 0.
+
+
+        //to get rainbow, pastel colors
+//        Random random = new Random();
+//        final float hue = random.nextFloat();
+//        final float saturation = 0.9f;//1.0 for brilliant, 0.0 for dull
+//        final float luminance = 1.0f; //1.0 for brighter, 0.0 for black
+//        return Color.hsb(hue, saturation, luminance);
     }
 
     public Color getColorByIndex(int index)

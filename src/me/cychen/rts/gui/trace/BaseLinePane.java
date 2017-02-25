@@ -21,7 +21,7 @@ public class BaseLinePane extends Pane {
         setLayoutY(inLayoutY);
 
         baseLine.setEndX(globalTimeLine.getCurrentEndTimestamp());
-        baseLine.setStroke(Color.BLUE);
+        baseLine.setStroke(Color.BLACK);
         baseLine.setStrokeWidth(1);
         getChildren().add(baseLine);
     }
