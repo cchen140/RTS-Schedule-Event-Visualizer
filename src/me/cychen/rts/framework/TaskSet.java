@@ -43,9 +43,9 @@ public class TaskSet {
     //    return addTask(taskId, taskTitle, taskType, taskPeriod, taskPeriod, taskComputationTime, taskPriority);
     //}
 
-    //public void addTask(Task inTask) {
-    //
-    //}
+    public void addTask(Task inTask) {
+        tasks.put(inTask.getId(), inTask);
+    }
 
     public Task addBlankTask() {
         int newTaskId = getLargestTaskId() + 1;
@@ -230,5 +230,153 @@ public class TaskSet {
             largestId = (largestId>thisId) ? largestId : thisId;
         }
         return largestId;
+    }
+
+    static long GCD(long a, long b) {
+        long Remainder;
+
+        while (b != 0) {
+            Remainder = a % b;
+            a = b;
+            b = Remainder;
+        }
+
+        return a;
+    }
+
+    static long LCM(long a, long b) {
+        return a * b / GCD(a, b);
+    }
+
+    public long calHyperPeriod() {
+        long hyperPeriod = 1;
+        for (Task thisTask : getAppTasksAsArray()) {
+            hyperPeriod = LCM(hyperPeriod, thisTask.getPeriod());
+        }
+        return hyperPeriod;
+    }
+
+    public Boolean schedulabilityTest() {
+        //int numTasks = taskContainer.getAppTasksAsArray().size();
+        for (Task thisTask : getAppTasksAsArray()) {
+            long thisWCRT = calc_WCRT(thisTask);
+            if (thisWCRT > thisTask.getDeadline()) {
+                // unschedulable.
+                //ProgMsg.errPutline("%d > %d", thisWCRT, thisTask.getDeadlineNs());
+                return false;
+            } else {
+                //ProgMsg.sysPutLine("ok: %d < %d", thisWCRT, thisTask.getDeadlineNs());
+            }
+        }
+        return true;
+    }
+
+    // Code modified from Man-Ki's code
+    long calc_WCRT(Task task_i) {
+        int numItr = 0;
+        long Wi = task_i.getExecTime();
+        long prev_Wi = 0;
+
+        //int numTasks = taskContainer.getAppTasksAsArray().size();
+        while (true) {
+            int interference = 0;
+            for (Task thisTask : getAppTasksAsArray()) {
+                Task task_hp = thisTask;
+                if (task_hp.getPriority() <= task_i.getPriority())  // Priority: the bigger the higher
+                    continue;
+
+                long Tj = task_hp.getPeriod();
+                long Cj = task_hp.getExecTime();
+
+                interference += (int)myCeil((double)Wi / (double)Tj) * Cj;
+            }
+
+            Wi = task_i.getExecTime() + interference;
+
+            if (Long.compare(Wi, prev_Wi) == 0)
+                return Wi;
+
+            prev_Wi = Wi;
+
+            numItr++;
+            if (numItr > 1000 || Wi < 0)
+                return Integer.MAX_VALUE;
+        }
+    }
+
+
+    // Code from Man-Ki
+    double myCeil(double val) {
+        double diff = Math.ceil(val) - val;
+        if (diff > 0.99999) {
+            //ProgMsg.errPutline("###" + (val) + "###\t\t " + Math.ceil(val));
+            System.exit(-1);
+        }
+        return Math.ceil(val);
+    }
+
+    // The bigger the number the higher the priority
+    // When calling this function, the taskContainer should not contain idle task.
+    public void assignPriorityRm()
+    {
+        ArrayList<Task> allTasks = getTasksAsArray();
+        int numTasks = getAppTasksAsArray().size();
+
+        /* Assign priorities (RM) */
+        for (Task task_i : getAppTasksAsArray()) {
+            //Task task_i = allTasks.get(i);
+            int cnt = 1;    // 1 represents highest priority.
+            /* Get the priority by comparing other tasks. */
+            for (Task task_j : getAppTasksAsArray()) {
+                if (task_i.equals(task_j))
+                    continue;
+
+                //Task task_j = allTasks.get(j);
+                if (task_j.getPeriod() > task_i.getPeriod()
+                        || (task_j.getPeriod() == task_i.getPeriod() && task_j.getId() > task_i.getId())) {
+                    cnt++;
+                }
+            }
+            task_i.setPriority(cnt);
+        }
+    }
+
+    public Boolean containPeriod(int inPeriod) {
+        for (Task thisTask: tasks.values())
+        {
+            if (thisTask.getPeriod() == inPeriod)
+                return true;
+        }
+        return false;
+    }
+
+    public long getLargestPeriod() {
+        long largestPeriod = 0;
+        for (Task thisTask: tasks.values()) {
+            largestPeriod = (thisTask.getPeriod() > largestPeriod) ? thisTask.getPeriod() : largestPeriod;
+        }
+        return largestPeriod;
+    }
+
+    public Boolean hasHarmonicPeriods() {
+        for (Task taskA: getAppTasksAsArray()) {
+            for (Task taskB: getAppTasksAsArray()) {
+                if (taskA == taskB)
+                    continue;
+
+                if (taskA.getPeriod() % taskB.getPeriod() == 0)
+                    return true;
+            }
+        }
+        // No harmonic periods.
+        return false;
+    }
+
+    public double getUtilization() {
+        double resultUtil = 0;
+        for (Task thisTask : getAppTasksAsArray()) {
+            resultUtil += ((double)thisTask.getExecTime())/((double)thisTask.getPeriod());
+        }
+        return resultUtil;
     }
 }

@@ -1,7 +1,6 @@
 package me.cychen.rts.util;
 
 import me.cychen.rts.event.EventContainer;
-import me.cychen.rts.event.InstantEvent;
 import me.cychen.rts.event.TaskInstantEvent;
 import me.cychen.rts.framework.Task;
 import me.cychen.rts.framework.TaskSet;
@@ -177,7 +176,7 @@ public class V11LogParser implements LogParser {
                 firstTimestamp = timeStamp;
             }
             /* TODO: the scale of the timestamp should be flexible and configurable. */
-            //int timestampNs = (int) ((timeStamp - firstTimestamp) * ProgConfig.TIMESTAMP_UNIT_NS );/// ProgConfig.TRACE_HORIZONTAL_SCALE_DIVIDER);
+            //int timestampNs = (int) ((timeStamp - firstTimestamp) * GuiConfig.TIMESTAMP_UNIT_NS );/// GuiConfig.TRACE_HORIZONTAL_SCALE_DIVIDER);
             timeStamp = timeStamp - firstTimestamp;
 
             int eventTaskId = Integer.valueOf(splitStrings[1].trim()).intValue();
@@ -187,13 +186,13 @@ public class V11LogParser implements LogParser {
             switch (inCurrentLogBlock)
             {
                 case LOG_BLOCK_SCHEDULER_LOG:
-                    eventContainer.add(EventContainer.SCHEDULER_EVENT, timeStamp, eventTaskId, eventData, eventString);
+                    eventContainer.addNextEvent(EventContainer.SCHEDULER_EVENT, timeStamp, eventTaskId, eventData, eventString);
                     break;
                 case LOG_BLOCK_APP_LOG:
-                    eventContainer.add(EventContainer.INSTANT_EVENT, timeStamp, eventTaskId, eventData, eventString);
+                    eventContainer.addNextEvent(EventContainer.INSTANT_EVENT, timeStamp, eventTaskId, eventData, eventString);
                     break;
                 //case LOG_BLOCK_HACKER_LOG:
-                    //eventContainer.add(EventContainer.HACKER_EVENT, timestampNs, eventTaskId, eventData, eventString);
+                    //eventContainer.addNextEvent(EventContainer.HACKER_EVENT, timestampNs, eventTaskId, eventData, eventString);
                     //break;
                 default:
                     break;

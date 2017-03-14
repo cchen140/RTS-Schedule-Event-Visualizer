@@ -10,18 +10,26 @@ public class Task {
     public static int TASK_TYPE_IDLE = 3;
     public static int TASK_TYPE_HACK = 4;
 
+    public static int IDLE_TASK_ID = -1;
+
+    /* Fundamental Task Parameters */
     protected int id = 0;
     private int taskType = TASK_TYPE_UNKNOWN;
 
     private String title = "";
 
     protected long period = 0;
+    protected long deadline = 0;
 
     protected long execTime = 0;
     protected long execTimeError = 500000;  // The error should be positive.
 
     protected int priority = 0;
-    protected long deadline = 0;
+
+    protected long initialOffset = 0;
+
+    /* Parameters for Simulation */
+    protected long nextReleaseTime = 0;
 
     public Task(){}
 
@@ -39,6 +47,15 @@ public class Task {
     //public Task(Task inTask) {
     //    cloneSettings(inTask);
     //}
+
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public int getId()
     {
@@ -78,5 +95,37 @@ public class Task {
 
     public long getExecTimeError() {
         return execTimeError;
+    }
+
+    public long getInitialOffset() {
+        return initialOffset;
+    }
+
+    public void setInitialOffset(long initialOffset) {
+        this.initialOffset = initialOffset;
+    }
+
+    public long getNextReleaseTime() {
+        return nextReleaseTime;
+    }
+
+    public void setNextReleaseTime(long nextReleaseTime) {
+        this.nextReleaseTime = nextReleaseTime;
+    }
+
+    public void setTaskType(int taskType) {
+        this.taskType = taskType;
+    }
+
+    public void setPeriod(long period) {
+        this.period = period;
+    }
+
+    public void setDeadline(long deadline) {
+        this.deadline = deadline;
+    }
+
+    public void setExecTime(long execTime) {
+        this.execTime = execTime;
     }
 }

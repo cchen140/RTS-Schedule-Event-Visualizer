@@ -29,7 +29,7 @@ public class EventContainer {
 
     public EventContainer(){}
 
-    public void add(int inEventType, long inTimestamp, int inEventTaskId, int inData, String inEventString)
+    public void addNextEvent(int inEventType, long inTimestamp, int inEventTaskId, int inData, String inEventString)
     {
         if (inEventType == SCHEDULER_EVENT)
         {// inEventTaskId is 0 as from scheduler, inData is the Id of the task being scheduled.
@@ -45,12 +45,20 @@ public class EventContainer {
         }
         //else if (inEventType == HACKER_EVENT)
         //{
-        //    hackerEvents.add(new HackerEvent(inTimestampNs, taskSet.getTaskById(inEventTaskId), inData, inEventString));
+        //    hackerEvents.addNextEvent(new HackerEvent(inTimestampNs, taskSet.getTaskById(inEventTaskId), inData, inEventString));
         //}
         else if (inEventType == INSTANT_EVENT)
         {
             taskInstantEvents.add(new TaskInstantEvent(inTimestamp, taskSet.getTaskById(inEventTaskId), inData, inEventString));
         }
+    }
+
+    public void add(SchedulerIntervalEvent inSchedulerIntervalEvent) {
+        schedulerEvents.add(inSchedulerIntervalEvent);
+    }
+
+    public void add (TaskInstantEvent inTaskInstantEvent) {
+        taskInstantEvents.add(inTaskInstantEvent);
     }
 
     public void clearAll()
@@ -106,7 +114,7 @@ public class EventContainer {
 //        {
 //            if (currentEvent.getTaskId() == HackerEvent.lowHackerId)
 //            {
-//                resultArrayList.add(currentEvent);
+//                resultArrayList.addNextEvent(currentEvent);
 //            }
 //        }
 //        return resultArrayList;

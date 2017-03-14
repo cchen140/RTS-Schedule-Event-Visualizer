@@ -8,12 +8,11 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import me.cychen.rts.event.Event;
 import me.cychen.rts.event.SchedulerIntervalEvent;
-import me.cychen.rts.gui.ProgConfig;
+import me.cychen.rts.gui.GuiConfig;
 import me.cychen.rts.gui.TaskSetGuiController;
 import me.cychen.rts.gui.TimeLine;
 import me.cychen.rts.gui.event.EventPane;
 import me.cychen.rts.gui.event.IntervalEventPane;
-import me.cychen.util.ProgMsg;
 
 import java.util.HashMap;
 
@@ -21,9 +20,9 @@ import java.util.HashMap;
  * Created by jjs on 2/13/17.
  */
 public class TracePane extends Pane {
-    private double baselineY = (ProgConfig.TRACE_PANE_HEIGHT+ProgConfig.TRACE_PANE_CONTENT_HEIGHT)/2;
-    private double contentReferenceY = (ProgConfig.TRACE_PANE_HEIGHT-ProgConfig.TRACE_PANE_CONTENT_HEIGHT)/2;
-    //private double currentOffsetX = ProgConfig.TRACE_BEGIN_OFFSET_X;
+    private double baselineY = (GuiConfig.TRACE_PANE_HEIGHT+ GuiConfig.TRACE_PANE_CONTENT_HEIGHT)/2;
+    private double contentReferenceY = (GuiConfig.TRACE_PANE_HEIGHT- GuiConfig.TRACE_PANE_CONTENT_HEIGHT)/2;
+    //private double currentOffsetX = GuiConfig.TRACE_BEGIN_OFFSET_X;
     //private double currentEndTimestamp = 0;
 
     private TimeLine globalTimeLine;
@@ -42,15 +41,15 @@ public class TracePane extends Pane {
         globalTimeLine = inTimeLine;
         globalTaskSet = inTaskSet;
 
-        setPrefHeight(ProgConfig.TRACE_PANE_HEIGHT);
+        setPrefHeight(GuiConfig.TRACE_PANE_HEIGHT);
         setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
 
-        baseLine = new BaseLinePane(globalTimeLine, ProgConfig.TRACE_BEGIN_OFFSET_X, baselineY);
+        baseLine = new BaseLinePane(globalTimeLine, GuiConfig.TRACE_BEGIN_OFFSET_X, baselineY);
         getChildren().add(baseLine);
     }
 
     public void addSchedulerIntervalEvent(SchedulerIntervalEvent inEvent) {
-        IntervalEventPane newIntervalEventPane = new IntervalEventPane(globalTaskSet, inEvent, ProgConfig.TRACE_BEGIN_OFFSET_X, contentReferenceY);
+        IntervalEventPane newIntervalEventPane = new IntervalEventPane(globalTaskSet, inEvent, GuiConfig.TRACE_BEGIN_OFFSET_X, contentReferenceY);
 
         eventShapes.put(inEvent, newIntervalEventPane);
         lastEvent = inEvent;

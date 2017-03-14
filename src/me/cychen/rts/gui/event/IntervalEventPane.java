@@ -1,12 +1,10 @@
 package me.cychen.rts.gui.event;
 
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import me.cychen.rts.event.SchedulerIntervalEvent;
-import me.cychen.rts.gui.ProgConfig;
+import me.cychen.rts.gui.GuiConfig;
 import me.cychen.rts.gui.TaskSetGuiController;
 import me.cychen.util.ProgMsg;
 
@@ -27,7 +25,7 @@ public class IntervalEventPane extends EventPane {
 
         setLayoutX(offsetX);
 
-        box = new Rectangle(0, contentReferenceY, inEvent.getScaledDuration(), ProgConfig.TRACE_PANE_CONTENT_HEIGHT);
+        box = new Rectangle(0, contentReferenceY, inEvent.getScaledDuration(), GuiConfig.TRACE_PANE_CONTENT_HEIGHT);
         box.setFill(globalTaskSet.getColorByTask(event.getTask()));
         getChildren().add(box);
 
@@ -45,7 +43,7 @@ public class IntervalEventPane extends EventPane {
         setLayoutX(offsetX);
         //box.setX(event.getScaledBeginTimestamp()+offsetX);
         box.setWidth(event.getScaledDuration());
-        box.setHeight(ProgConfig.TRACE_PANE_CONTENT_HEIGHT);
+        box.setHeight(GuiConfig.TRACE_PANE_CONTENT_HEIGHT);
         box.setFill(globalTaskSet.getColorByTask(event.getTask()));
         ProgMsg.putLine("" + event.getScaledDuration());
     }

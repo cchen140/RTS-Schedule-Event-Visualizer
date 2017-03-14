@@ -52,7 +52,7 @@ public class MainSceneController {
     protected void initialize() {
         ProgMsg.setTargetDoc(textFlowProgMsg);
         scrollPaneProgMsg.setVvalue(1.0);   // Always scroll to the end.
-        //test.getChildren().add(new Button("Click me!"));
+        //test.getChildren().addNextEvent(new Button("Click me!"));
 
         //leftControlPaneFoldingButton.setOnMouseClicked();
 
