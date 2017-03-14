@@ -13,7 +13,7 @@ import java.io.IOException;
 /**
  * Created by CY on 2/13/17.
  */
-public class V10LogParser implements LogParser {
+public class V11LogParser implements LogParser {
     public static final int PARSER_VERSION = 10;
 
     private static final int LOG_BLOCK_UNKNOWN = 0;

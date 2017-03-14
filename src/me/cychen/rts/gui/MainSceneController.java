@@ -16,7 +16,7 @@ import me.cychen.rts.event.SchedulerIntervalEvent;
 import me.cychen.rts.event.TaskInstantEvent;
 import me.cychen.rts.framework.Task;
 import me.cychen.rts.gui.trace.TracePane;
-import me.cychen.rts.util.V10LogParser;
+import me.cychen.rts.util.V11LogParser;
 import me.cychen.util.ProgMsg;
 import me.cychen.util.connect.SerialConnection;
 
@@ -42,7 +42,7 @@ public class MainSceneController {
     TimeLine globalTimeLine = new TimeLine();
 
     TaskSetGuiController globalTaskSet = new TaskSetGuiController();
-    V10LogParser serialLogStringParser = new V10LogParser();
+    me.cychen.rts.util.V11LogParser serialLogStringParser = new V11LogParser();
 
     TracePane serialInputTrace = new TracePane(globalTimeLine, globalTaskSet);
 

@@ -34,8 +34,8 @@ public class LogHandler extends FileHandler{
 
         // We've got version number, now initialize the logParser.
         switch (versionNumber) {
-            case V10LogParser.PARSER_VERSION:
-                logParser = new V10LogParser();
+            case V11LogParser.PARSER_VERSION:
+                logParser = new V11LogParser();
                 break;
             default:
                 throw new IOException("Cannot find log format number at the first line.");
