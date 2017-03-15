@@ -55,7 +55,7 @@ abstract class SchedulerSimulator {
 //    }
 
     abstract public boolean runSim(long tickLimit);
-    abstract public void setTaskSetHook();
+    abstract protected void setTaskSetHook();
 
     public void setTaskSet(TaskSet inTaskSet)
     {

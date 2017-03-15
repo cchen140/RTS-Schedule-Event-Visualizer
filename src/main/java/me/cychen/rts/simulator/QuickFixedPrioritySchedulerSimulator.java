@@ -144,7 +144,7 @@ public class QuickFixedPrioritySchedulerSimulator extends SchedulerSimulator {
     }
 
     @Override
-    public void setTaskSetHook() {
+    protected void setTaskSetHook() {
         assignPriority();
     }
 
