@@ -62,6 +62,14 @@ public class ColorList {
 //        return Color.hsb(hue, saturation, luminance);
     }
 
+    public void resetColorIndex(Integer index) {
+        if (index == null) {
+            colorIndex = 0;
+        } else {
+            colorIndex = index;
+        }
+    }
+
     public Color getColorByIndex(int index)
     {
         // ArrayList index starts from 0.

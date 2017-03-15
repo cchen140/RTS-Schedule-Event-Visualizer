@@ -10,7 +10,7 @@ public class Task {
     public static int TASK_TYPE_IDLE = 3;
     public static int TASK_TYPE_HACK = 4;
 
-    public static int IDLE_TASK_ID = -1;
+    public static int IDLE_TASK_ID = 0;
 
     /* Fundamental Task Parameters */
     protected int id = 0;

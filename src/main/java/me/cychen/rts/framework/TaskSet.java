@@ -210,8 +210,23 @@ public class TaskSet {
         return null;
     }
 
+    public Task getIdleTask() {
+        for (Task thisTask : tasks.values()) {
+            if (thisTask.getTaskType() == Task.TASK_TYPE_IDLE) {
+                return thisTask;
+            }
+        }
+        return null;
+    }
+
+    public void addIdleTask() {
+        if (getIdleTask() == null) {
+            tasks.put(Task.IDLE_TASK_ID, new Task(Task.IDLE_TASK_ID, "IDLE", Task.TASK_TYPE_IDLE, 0, 0, 0, 0));
+        }
+    }
+
     public void removeIdleTask() {
-        Task idleTask = getTaskByName("IDLE");
+        Task idleTask = getIdleTask();
         if (idleTask != null) {
             removeTask(idleTask);
         }

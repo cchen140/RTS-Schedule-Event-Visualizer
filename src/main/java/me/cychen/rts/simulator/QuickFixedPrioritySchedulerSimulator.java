@@ -173,7 +173,7 @@ public class QuickFixedPrioritySchedulerSimulator extends SchedulerSimulator {
         progressUpdater.setIsStarted(true);
         int orgNumOfJobsToSim = jobContainer.size();
 
-        Task idleTask = taskSet.getTaskById(Task.IDLE_TASK_ID);
+        Task idleTask = taskSet.getIdleTask();
         Task currentRunTask = null;
         Job currentJob = null;
         Job nextJob;
@@ -249,9 +249,13 @@ public class QuickFixedPrioritySchedulerSimulator extends SchedulerSimulator {
             } else {
 
                 // No next higher priority event, thus finish the last remaining job.
-                SchedulerIntervalEvent currentJobEvent = new SchedulerIntervalEvent( currentTimeStamp, (int)(currentTimeStamp+currentJob.remainingExecTime), currentRunTask, "END");
+                SchedulerIntervalEvent currentJobEvent = new SchedulerIntervalEvent( currentTimeStamp, (int)(currentTimeStamp+currentJob.remainingExecTime), currentRunTask, "");
                 simEventContainer.add(currentJobEvent);
                 //resultSchedulingEvents.addNextEvent(currentJobEvent);
+
+                // Add an instant event to tell that it is the end of the job.
+                TaskInstantEvent currentJobEndEvent = new TaskInstantEvent(currentTimeStamp+currentJob.remainingExecTime, currentRunTask, 0, "END");
+                simEventContainer.add(currentJobEndEvent);
 
                 anyJobRunning = false;
                 currentTimeStamp = (int)(currentTimeStamp+currentJob.remainingExecTime);
@@ -268,7 +272,12 @@ public class QuickFixedPrioritySchedulerSimulator extends SchedulerSimulator {
     protected void assignPriority()
     {
         ArrayList<Task> allTasks = taskSet.getTasksAsArray();
-        int numTasks = taskSet.size();
+
+        // Don't include the idle task.
+        Task idleTask = taskSet.getIdleTask();
+        allTasks.remove(idleTask);
+
+        int numTasks = allTasks.size();
 
         /* Assign priorities (RM) */
         for (int i = 0; i < numTasks; i++) {

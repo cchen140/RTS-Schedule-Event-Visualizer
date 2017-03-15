@@ -267,6 +267,7 @@ public class TaskSetGenerator {
 //            }
 //        }
 
+        taskContainer.addIdleTask();
         return taskContainer;
 
 

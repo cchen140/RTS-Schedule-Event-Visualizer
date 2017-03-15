@@ -8,10 +8,12 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import me.cychen.rts.event.Event;
 import me.cychen.rts.event.SchedulerIntervalEvent;
+import me.cychen.rts.event.TaskInstantEvent;
 import me.cychen.rts.gui.GuiConfig;
-import me.cychen.rts.gui.TaskSetGuiController;
+import me.cychen.rts.gui.TaskSetGui;
 import me.cychen.rts.gui.TimeLine;
 import me.cychen.rts.gui.event.EventPane;
+import me.cychen.rts.gui.event.InstantEventPane;
 import me.cychen.rts.gui.event.IntervalEventPane;
 
 import java.util.HashMap;
@@ -28,14 +30,14 @@ public class TracePane extends Pane {
     private TimeLine globalTimeLine;
     private BaseLinePane baseLine;// = new BaseLinePane(currentOffsetX, baselineY);
 
-    private TaskSetGuiController globalTaskSet;
+    private TaskSetGui globalTaskSet;
 
     public SchedulerIntervalEvent lastEvent = null;
 
     private HashMap<Event, EventPane> eventShapes = new HashMap<>();
     //private ArrayList events = new ArrayList();
 
-    public TracePane(TimeLine inTimeLine, TaskSetGuiController inTaskSet) {
+    public TracePane(TimeLine inTimeLine, TaskSetGui inTaskSet) {
         super();
 
         globalTimeLine = inTimeLine;
@@ -46,6 +48,10 @@ public class TracePane extends Pane {
 
         baseLine = new BaseLinePane(globalTimeLine, GuiConfig.TRACE_BEGIN_OFFSET_X, baselineY);
         getChildren().add(baseLine);
+    }
+
+    public void setGlobalTaskSet(TaskSetGui globalTaskSet) {
+        this.globalTaskSet = globalTaskSet;
     }
 
     public void addSchedulerIntervalEvent(SchedulerIntervalEvent inEvent) {
@@ -61,6 +67,14 @@ public class TracePane extends Pane {
         //globalTimeLine.pushEndTimestamp(inEvent.getScaledEndTimestamp());
         //baseLine.setEndTimestamp(currentEndTimestamp);
         //setWidth(globalTimeLine.getCurrentEndTimestamp());
+
+        updateBaseLineGraph();
+    }
+
+    public void addTaskInstantEvent(TaskInstantEvent inEvent) {
+        InstantEventPane newInstantEventPane = new InstantEventPane(globalTaskSet, inEvent, GuiConfig.TRACE_BEGIN_OFFSET_X, contentReferenceY);
+        eventShapes.put(inEvent, newInstantEventPane);
+        getChildren().add(newInstantEventPane);
 
         updateBaseLineGraph();
     }
@@ -117,5 +131,11 @@ public class TracePane extends Pane {
         for (Event currentEvent : eventShapes.keySet()) {
             eventShapes.get(currentEvent).updateGraph();
         }
+    }
+
+    public void clear() {
+        lastEvent = null;
+        eventShapes.clear();
+        getChildren().clear();
     }
 }

@@ -1,5 +1,7 @@
 package me.cychen.rts.gui;
 
+import javafx.scene.paint.Color;
+
 /**
  * Created by jjs on 2/13/17.
  */
@@ -37,7 +39,7 @@ public class GuiConfig {
 //    public static int TRACE_GROUP_MARGIN_Y = 10;
 //
 //    /* Trace Settings */
-//    public static Color IDLE_TASK_COLOR = new Color(235, 235, 235); // lighter than light grey
+    public static Color IDLE_TASK_COLOR = new Color(235.0/255.0, 235.0/255.0, 235.0/255.0, 1); // lighter than light grey
 //    public static double TRACE_HORIZONTAL_SCALE_FACTOR = 5.0;// / (double)TIMESTAMP_UNIT_NS; how many counts per TIMESTAMP_UNIT_NS
 //    public static int TIME_LINE_PERIOD_NS = 10_000_000; // 10ms
 //    public static int TRACE_HEIGHT = 80;

@@ -12,17 +12,25 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
+import me.cychen.rts.event.EventContainer;
 import me.cychen.rts.event.SchedulerIntervalEvent;
 import me.cychen.rts.event.TaskInstantEvent;
 import me.cychen.rts.framework.Task;
 import me.cychen.rts.gui.trace.TracePane;
+import me.cychen.rts.simulator.QuickFixedPrioritySchedulerSimulator;
+import me.cychen.rts.simulator.TaskSetContainer;
+import me.cychen.rts.simulator.TaskSetGenerator;
 import me.cychen.rts.util.V11LogParser;
 import me.cychen.util.ProgMsg;
 import me.cychen.util.connect.SerialConnection;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 
 public class MainSceneController {
+    private static final Logger logger = LogManager.getLogger("MainSceneController");
+
     @FXML
     public ScrollPane scrollPaneProgMsg;
     public TextFlow textFlowProgMsg;
@@ -33,6 +41,7 @@ public class MainSceneController {
     //public TextField textFieldSerialPortName;
     public ChoiceBox choiceBoxSerialPortList;
     public Button btnStartStop;
+    public Button btnRunSim;
     public ScrollPane scrollPaneTraceContent;
 
     /* local variables */
@@ -41,7 +50,7 @@ public class MainSceneController {
     SerialConnection serialConnection;
     TimeLine globalTimeLine = new TimeLine();
 
-    TaskSetGuiController globalTaskSet = new TaskSetGuiController();
+    TaskSetGui globalTaskSet = new TaskSetGui();
     me.cychen.rts.util.V11LogParser serialLogStringParser = new V11LogParser();
 
     TracePane serialInputTrace = new TracePane(globalTimeLine, globalTaskSet);
@@ -117,6 +126,38 @@ public class MainSceneController {
             if (startSerialPortReceiver()) {
                 btnStartStop.setText("Stop");
             }
+        }
+    }
+
+    @FXML
+    private void runSimulation() {
+        logger.info("Button clicked.");
+
+        // Clear existing data
+        serialInputTrace.clear();
+        globalTaskSet.clear();
+
+        // Generate a task set.
+        TaskSetGenerator taskSetGenerator = new TaskSetGenerator();
+        TaskSetContainer taskSets = taskSetGenerator.generate(5, 1);
+        globalTaskSet.importTaskSet(taskSets.getTaskSets().get(0));
+        globalTaskSet.applyColors();
+        logger.info(globalTaskSet.getUtilization());
+
+        // New and configure a RM scheduling simulator.
+        QuickFixedPrioritySchedulerSimulator rmSimulator = new QuickFixedPrioritySchedulerSimulator();
+        rmSimulator.setTaskSet(globalTaskSet);
+
+        // Run simulation.
+        rmSimulator.runSim(1000);
+        EventContainer eventContainer = rmSimulator.getSimEventContainer();
+
+        for (SchedulerIntervalEvent thisEvent : eventContainer.getSchedulerEvents()) {
+            serialInputTrace.addSchedulerIntervalEvent(thisEvent);
+        }
+
+        for (TaskInstantEvent thisEvent : eventContainer.getTaskInstantEvents()) {
+            serialInputTrace.addTaskInstantEvent(thisEvent);
         }
     }
 
