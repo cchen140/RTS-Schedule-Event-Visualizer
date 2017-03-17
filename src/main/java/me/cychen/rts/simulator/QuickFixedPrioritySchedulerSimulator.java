@@ -22,7 +22,7 @@ public class QuickFixedPrioritySchedulerSimulator extends SchedulerSimulator {
     // Write scheduling inference to ArrayList<TaskIntervalEvent> inside the busy interval.
     /* Prerequisite: arrival time windows */
     // TODO: It doesn't handle the scheduling correctly when multiple tasks have the same period.
-//    public static void constructSchedulingOfBusyIntervalByArrivalWindow( BusyInterval bi )
+//    public static void constructSchedulingOfBusyIntervalByArrivalWindow( BusyIntervalEvent bi )
 //    {
 //        // Get the arrival events by replicating the container since we'll be modifying the container later (pop events).
 //        TaskArrivalEventContainer arrivalEventContainer = new TaskArrivalEventContainer( bi.arrivalInference );
@@ -116,7 +116,7 @@ public class QuickFixedPrioritySchedulerSimulator extends SchedulerSimulator {
 //    }
 
     /* This function is only used by Amir's algorithm to reconstruct schedules. */
-//    public static QuickRmSimJobContainer arrivalWindowsToSimJobs( BusyInterval bi )
+//    public static QuickRmSimJobContainer arrivalWindowsToSimJobs( BusyIntervalEvent bi )
 //    {
 //        QuickRmSimJobContainer resultSimJobs = new QuickRmSimJobContainer();
 //        TaskArrivalEventContainer arrivalEventContainer = bi.arrivalInference;
@@ -224,8 +224,16 @@ public class QuickFixedPrioritySchedulerSimulator extends SchedulerSimulator {
             if ( nextJob != null ) {
                 // Current job is being preempted. Create and push the updated current job.
                 SchedulerIntervalEvent currentJobEvent = new SchedulerIntervalEvent((int) currentJob.releaseTime, (int) nextJob.releaseTime, currentRunTask, "");
+
+                // Check last task's scheduling states.
+                if ( currentJob.hasStarted == false ) {
+                    currentJob.hasStarted = true;
+                    currentJobEvent.setScheduleStates(SchedulerIntervalEvent.SCHEDULE_STATE_START, SchedulerIntervalEvent.SCHEDULE_STATE_SUSPEND);
+                } else {
+                    currentJobEvent.setScheduleStates(SchedulerIntervalEvent.SCHEDULE_STATE_RESUME, SchedulerIntervalEvent.SCHEDULE_STATE_SUSPEND);
+                }
+
                 simEventContainer.add(currentJobEvent);
-                //resultSchedulingEvents.addNextEvent(currentJobEvent);
 
                 currentJob.remainingExecTime -= (nextJob.releaseTime - currentTimeStamp);
                 currentJob.releaseTime = nextJob.releaseTime;
@@ -235,27 +243,19 @@ public class QuickFixedPrioritySchedulerSimulator extends SchedulerSimulator {
                 currentRunTask = currentJob.task;
                 currentTimeStamp = (int)currentJob.releaseTime;
 
-                // Check if it is the beginning of a new job.
-                //if ( ((int)currentJob.remainingExecTime) == currentRunTask.getComputationTimeNs() ) {
-                if ( currentJob.hasStarted == false ) {
-                    currentJob.hasStarted = true;
-                    TaskInstantEvent thisReleaseEvent = new TaskInstantEvent((int) currentJob.releaseTime, currentRunTask, 0, "BEGIN");
-                    simEventContainer.add(thisReleaseEvent);
-                    //resultSchedulingEvents.addNextEvent(thisReleaseEvent);
-                    //bi.startTimesInference.addNextEvent(thisReleaseEvent);
-                }
-
-
             } else {
 
                 // No next higher priority event, thus finish the last remaining job.
                 SchedulerIntervalEvent currentJobEvent = new SchedulerIntervalEvent( currentTimeStamp, (int)(currentTimeStamp+currentJob.remainingExecTime), currentRunTask, "");
-                simEventContainer.add(currentJobEvent);
-                //resultSchedulingEvents.addNextEvent(currentJobEvent);
+                // Check last task's scheduling states.
+                if ( currentJob.hasStarted == false ) {
+                    currentJob.hasStarted = true;
+                    currentJobEvent.setScheduleStates(SchedulerIntervalEvent.SCHEDULE_STATE_START, SchedulerIntervalEvent.SCHEDULE_STATE_END);
+                } else {
+                    currentJobEvent.setScheduleStates(SchedulerIntervalEvent.SCHEDULE_STATE_RESUME, SchedulerIntervalEvent.SCHEDULE_STATE_END);
+                }
 
-                // Add an instant event to tell that it is the end of the job.
-                TaskInstantEvent currentJobEndEvent = new TaskInstantEvent(currentTimeStamp+currentJob.remainingExecTime, currentRunTask, 0, "END");
-                simEventContainer.add(currentJobEndEvent);
+                simEventContainer.add(currentJobEvent);
 
                 anyJobRunning = false;
                 currentTimeStamp = (int)(currentTimeStamp+currentJob.remainingExecTime);
