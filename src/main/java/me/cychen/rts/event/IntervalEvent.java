@@ -18,6 +18,15 @@ public class IntervalEvent extends Event {
 
     public IntervalEvent(){}
 
+    public IntervalEvent(long inBeginTimeStamp, long inEndTimeStamp)
+    {
+        orgBeginTimestamp = inBeginTimeStamp;
+        scaledBeginTimestamp = inBeginTimeStamp;
+
+        orgEndTimestamp = inEndTimeStamp;
+        scaledEndTimestamp = inEndTimeStamp;
+    }
+
     public long getOrgBeginTimestamp() { return orgBeginTimestamp; }
     public long getScaledBeginTimestamp()
     {

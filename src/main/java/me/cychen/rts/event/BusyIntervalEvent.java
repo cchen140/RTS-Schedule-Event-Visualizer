@@ -8,67 +8,45 @@ import java.util.ArrayList;
  * Created by CY on 5/21/2015.
  */
 public class BusyIntervalEvent extends IntervalEvent {
-    private int beginTimeStampNs = 0;
-    private int endTimeStampNs = 0;
-    TaskReleaseEventContainer compositionGroundTruth;
+    //private long beginTimeStamp = 0;
+    //private long endTimeStamp = 0;
+    //TaskReleaseEventContainer compositionGroundTruth;
     //TaskReleaseEventContainer compositionInference = new TaskReleaseEventContainer();
     //TaskArrivalEventContainer arrivalInference = new TaskArrivalEventContainer();
-    ArrayList schedulingInference = new ArrayList<>();
+    //ArrayList schedulingInference = new ArrayList<>();
 
     // There may have multiple inferences, so two-layer array is used here.
     private ArrayList<ArrayList<Task>> composition = new ArrayList<>();
 
-    public BusyIntervalEvent(int inBeginTimeStamp, int inEndTimeStamp)
+    ArrayList<SchedulerIntervalEvent> schedulerIntervalEvents = new ArrayList<>();
+
+    public BusyIntervalEvent(long inBeginTimeStamp, long inEndTimeStamp)
     {
-        beginTimeStampNs = inBeginTimeStamp;
-        endTimeStampNs = inEndTimeStamp;
+        super(inBeginTimeStamp, inEndTimeStamp);
     }
 
-    public void setCompositionGroundTruth(TaskReleaseEventContainer inGroundTruth)
-    {
-        compositionGroundTruth = inGroundTruth;
+    public ArrayList<SchedulerIntervalEvent> getSchedulerIntervalEvents() {
+        return schedulerIntervalEvents;
     }
+
+    //    public void setCompositionGroundTruth(TaskReleaseEventContainer inGroundTruth)
+//    {
+//        compositionGroundTruth = inGroundTruth;
+//    }
 
     public void setComposition(ArrayList<ArrayList<Task>> inComposition)
     {
         composition = inComposition;
     }
 
-    public int getIntervalNs()
-    {
-        return (endTimeStampNs - beginTimeStampNs);
-    }
-
-    public int getBeginTimeStampNs()
-    {
-        return beginTimeStampNs;
-    }
-
-    public TaskReleaseEventContainer getCompositionGroundTruth()
-    {
-        return  compositionGroundTruth;
-    }
+//    public TaskReleaseEventContainer getCompositionGroundTruth()
+//    {
+//        return  compositionGroundTruth;
+//    }
 
     public ArrayList<ArrayList<Task>> getComposition()
     {
         return composition;
-    }
-
-    public int getEndTimeStampNs() {
-        return endTimeStampNs;
-    }
-
-    public Boolean contains(int inTimeStamp)
-    {
-        if ((beginTimeStampNs <= inTimeStamp)
-                && (endTimeStampNs >= inTimeStamp))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
     }
 
     public Boolean containsComposition(Task inTask)

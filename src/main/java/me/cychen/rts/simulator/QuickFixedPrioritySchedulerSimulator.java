@@ -39,7 +39,7 @@ public class QuickFixedPrioritySchedulerSimulator extends SchedulerSimulator {
 //        Task currentRunTask = null;
 //        SimJob currentJob = null;
 //        SimJob nextJob;
-//        int currentTimeStamp = bi.getBeginTimeStampNs();    // TODO: may have to check whether it includes the error.
+//        int currentTimeStamp = bi.getBeginTimeStamp();    // TODO: may have to check whether it includes the error.
 //
 //        Boolean anyJobRunning = false;
 //        while ( true ) {
