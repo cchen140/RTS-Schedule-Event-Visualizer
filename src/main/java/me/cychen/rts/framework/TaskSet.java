@@ -394,4 +394,13 @@ public class TaskSet {
         }
         return resultUtil;
     }
+
+    @Override
+    public String toString() {
+        String outStr = "TaskSet(" + getUtilization() + "):\r\n";
+        for (Task thisTask : tasks.values()) {
+            outStr += "\t" + thisTask.toString() + "\r\n";
+        }
+        return outStr;
+    }
 }
