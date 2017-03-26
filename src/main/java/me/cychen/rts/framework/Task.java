@@ -128,4 +128,11 @@ public class Task {
     public void setExecTime(long execTime) {
         this.execTime = execTime;
     }
+
+    @Override
+    public String toString() {
+        return "Task-" + id +
+                ": p=" + period +
+                ", c=" + execTime;
+    }
 }
