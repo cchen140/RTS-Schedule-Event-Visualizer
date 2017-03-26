@@ -22,7 +22,7 @@ public class Task {
     protected long deadline = 0;
 
     protected long execTime = 0;
-    protected long execTimeError = 500000;  // The error should be positive.
+    protected long execTimeError = 1;  // The error should be positive.
 
     protected int priority = 0;
 

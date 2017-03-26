@@ -3,6 +3,7 @@ package me.cychen.rts.cli;
 import me.cychen.rts.event.BusyIntervalEventContainer;
 import me.cychen.rts.event.EventContainer;
 import me.cychen.rts.framework.TaskSet;
+import me.cychen.rts.scheduleak.ScheduLeakRestricted;
 import me.cychen.rts.simulator.QuickFixedPrioritySchedulerSimulator;
 import me.cychen.rts.simulator.TaskSetContainer;
 import me.cychen.rts.simulator.TaskSetGenerator;
@@ -21,6 +22,13 @@ public class Main {
 
         // Generate a task set.
         TaskSetGenerator taskSetGenerator = new TaskSetGenerator();
+
+        taskSetGenerator.setMaxPeriod(250);
+        taskSetGenerator.setMinPeriod(100);
+
+        taskSetGenerator.setMaxExecTime(50);
+        taskSetGenerator.setMinExecTime(5);
+
         taskSetGenerator.setMaxUtil(0.5);
         taskSetGenerator.setMinUtil(0.4);
         TaskSetContainer taskSets = taskSetGenerator.generate(5, 1);
@@ -32,15 +40,19 @@ public class Main {
         rmSimulator.setTaskSet(taskSet);
 
         // Run simulation.
-        rmSimulator.runSim(1000);
+        rmSimulator.runSim(10000);
         EventContainer eventContainer = rmSimulator.getSimEventContainer();
 
         BusyIntervalEventContainer biEvents = new BusyIntervalEventContainer();
         biEvents.createBusyIntervalsFromEvents(eventContainer);
 
+        ScheduLeakRestricted scheduLeakRestricted = new ScheduLeakRestricted(taskSet, biEvents);
+        EventContainer decomposedEvents = scheduLeakRestricted.runDecompositionWithErrors();
+
         ExcelLogHandler excelLogHandler = new ExcelLogHandler();
         excelLogHandler.genRowSchedulerIntervalEvents(eventContainer);
         excelLogHandler.genRowBusyIntervals(biEvents);
+        excelLogHandler.genRowSchedulerIntervalEvents(decomposedEvents);
         excelLogHandler.saveAndClose(null);
 
         logger.info(eventContainer.getAllEvents());
