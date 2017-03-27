@@ -2,10 +2,12 @@ package me.cychen.rts.event;
 
 import java.util.Collections;
 
+import java.util.Collections;
+
 /**
  * Created by CY on 7/29/2015.
  */
-public class TaskArrivalEventContainer extends TaskReleaseEventContainer {
+public class TaskArrivalEventContainer extends StartTimeEventContainer {
     public TaskArrivalEventContainer() {super();}
 
     public TaskArrivalEventContainer( TaskArrivalEventContainer inContainer )
@@ -26,20 +28,20 @@ public class TaskArrivalEventContainer extends TaskReleaseEventContainer {
         int beforeSwapping = 0;
         int afterSwapping = 0;
         do {
-            int numOfEvents = taskReleaseEvents.size();
-            beforeSwapping = taskReleaseEvents.hashCode();
+            int numOfEvents = startTimeEvents.size();
+            beforeSwapping = startTimeEvents.hashCode();
             for (int loop=0; loop<(numOfEvents-1) ; loop++) {
-                TaskInstantEvent thisEvent = taskReleaseEvents.get(loop);
-                TaskInstantEvent nextEvent = taskReleaseEvents.get(loop+1);
+                TaskInstantEvent thisEvent = startTimeEvents.get(loop);
+                TaskInstantEvent nextEvent = startTimeEvents.get(loop+1);
                 if ( thisEvent.getOrgTimestamp() == nextEvent.getOrgTimestamp() ) {
                     // This event and next event have the same arrival time, thus check priority in advance.
                     if ( nextEvent.getTask().getPriority() < thisEvent.getTask().getPriority() ) {
                         // Next event has higher priority, thus do swapping.
-                        Collections.swap( taskReleaseEvents, loop, loop+1 );
+                        Collections.swap(startTimeEvents, loop, loop+1 );
                     }
                 }
             }
-            afterSwapping = taskReleaseEvents.hashCode();
+            afterSwapping = startTimeEvents.hashCode();
 
             // If some elements are swapped, then the hash code would be different. Continue the process until nothing to swap.
         } while ( beforeSwapping != afterSwapping );
@@ -48,7 +50,7 @@ public class TaskArrivalEventContainer extends TaskReleaseEventContainer {
     /* Find the first event after the designated time stamp. */
     public TaskInstantEvent getNextEvent( int inTimeStamp )
     {
-        for ( TaskInstantEvent thisEvent : taskReleaseEvents ) {
+        for ( TaskInstantEvent thisEvent : startTimeEvents) {
             if ( thisEvent.getOrgTimestamp() >= inTimeStamp )
                 return thisEvent;
         }
@@ -60,9 +62,9 @@ public class TaskArrivalEventContainer extends TaskReleaseEventContainer {
     /* Pop the first event after the designated time stamp. */
     public TaskInstantEvent popNextEvent( int inTimeStamp )
     {
-        for ( TaskInstantEvent thisEvent : taskReleaseEvents ) {
+        for ( TaskInstantEvent thisEvent : startTimeEvents) {
             if ( thisEvent.getOrgTimestamp() >= inTimeStamp ) {
-                taskReleaseEvents.remove( thisEvent );
+                startTimeEvents.remove( thisEvent );
                 return thisEvent;
             }
 

@@ -5,13 +5,20 @@ import me.cychen.rts.framework.Task;
 import java.util.ArrayList;
 
 /**
- * Created by cy on 3/16/2017.
+ * Created by CY on 5/26/2015.
  */
 public class BusyIntervalEventContainer {
-    ArrayList<BusyIntervalEvent> busyIntervals = new ArrayList<BusyIntervalEvent>();
+    ArrayList<BusyIntervalEvent> busyIntervals = new ArrayList<>();
 
-    public Boolean createBusyIntervalsFromEvents(EventContainer inEventContainer)
-    {
+    public BusyIntervalEventContainer() {}
+
+    public BusyIntervalEventContainer(ArrayList<BusyIntervalEvent> inBusyIntervals) {
+        busyIntervals.addAll( inBusyIntervals );
+    }
+
+
+
+    public Boolean createBusyIntervalsFromEvents(EventContainer inEventContainer) {
         ArrayList<SchedulerIntervalEvent> schedulerEvents = inEventContainer.getSchedulerEvents();
         //ArrayList<TaskInstantEvent> appEvents = inEventContainer.getTaskInstantEvents();
 
@@ -22,15 +29,11 @@ public class BusyIntervalEventContainer {
         long beginTimeStamp = 0;
         long endTimeStamp = 0; // keep track on current end timestamp.
         ArrayList<SchedulerIntervalEvent> schedulerIntervalEventsInCurrentBI = new ArrayList<>();
-        for (SchedulerIntervalEvent currentEvent: schedulerEvents)
-        {
-            if (busyIntervalFound == false)
-            {
+        for (SchedulerIntervalEvent currentEvent : schedulerEvents) {
+            if (busyIntervalFound == false) {
                 if (currentEvent.getTask().getTaskType() == Task.TASK_TYPE_IDLE) {
                     continue;
-                }
-                else
-                { // Start of a busy interval is found.
+                } else { // Start of a busy interval is found.
                     busyIntervalFound = true;
                     beginTimeStamp = currentEvent.getOrgBeginTimestamp();
                     schedulerIntervalEventsInCurrentBI.clear();
@@ -38,8 +41,7 @@ public class BusyIntervalEventContainer {
                 }
             }
 
-            if (currentEvent.getTask().getTaskType() == Task.TASK_TYPE_IDLE)
-            { // This is the end of a busy interval.
+            if (currentEvent.getTask().getTaskType() == Task.TASK_TYPE_IDLE) { // This is the end of a busy interval.
                 endTimeStamp = currentEvent.getOrgBeginTimestamp();
                 //TaskReleaseEventContainer thisBusyIntervalGroundTruth = new TaskReleaseEventContainer();
                 BusyIntervalEvent thisBusyInterval = new BusyIntervalEvent(beginTimeStamp, endTimeStamp);
@@ -60,9 +62,7 @@ public class BusyIntervalEventContainer {
 
                 // Reset flag to search next busy interval.
                 busyIntervalFound = false;
-            }
-            else
-            { // current task is not idle, thus it is still within a busy interval. Continue searching for the idle task.
+            } else { // current task is not idle, thus it is still within a busy interval. Continue searching for the idle task.
                 schedulerIntervalEventsInCurrentBI.add(currentEvent);
                 endTimeStamp = currentEvent.getOrgEndTimestamp();
             }
@@ -80,20 +80,21 @@ public class BusyIntervalEventContainer {
         return true;
     }
 
-//    public Boolean createBusyIntervalsFromIntervalEvents(ArrayList<IntervalEvent> inEvents)
-//    {
-//        // Reset the variable.
-//        busyIntervals.clear();
-//
-//        for (IntervalEvent thisEvent : inEvents)
-//        {
-//            long thisBeginTimeStamp = thisEvent.getOrgBeginTimestamp();
-//            long thisEndTimeStamp = thisEvent.getOrgEndTimestamp();
-//            BusyIntervalEvent thisBusyInterval = new BusyIntervalEvent(thisBeginTimeStamp, thisEndTimeStamp);
-//            busyIntervals.add(thisBusyInterval);
-//        }
-//        return true;
-//    }
+    /* This is used to convert events from Zedboard log. */
+    public Boolean createBusyIntervalsFromIntervalEvents(ArrayList<IntervalEvent> inEvents)
+    {
+        // Reset the variable.
+        busyIntervals.clear();
+
+        for (IntervalEvent thisEvent : inEvents)
+        {
+            long thisBeginTimeStamp = thisEvent.getOrgBeginTimestamp();
+            long thisEndTimeStamp = thisEvent.getOrgEndTimestamp();
+            BusyIntervalEvent thisBusyInterval = new BusyIntervalEvent(thisBeginTimeStamp, thisEndTimeStamp);
+            busyIntervals.add(thisBusyInterval);
+        }
+        return true;
+    }
 
     public ArrayList<BusyIntervalEvent> getBusyIntervals()
     {
@@ -114,20 +115,33 @@ public class BusyIntervalEventContainer {
         return null;
     }
 
-    public ArrayList<BusyIntervalEvent> findBusyIntervalsByTask(Task inTask)
+    public ArrayList<BusyIntervalEvent> findBusyIntervalsBeforeTimeStamp(int inTimeStamp)
     {
-        ArrayList<BusyIntervalEvent> resultArrayList = new ArrayList<>();
+        ArrayList<BusyIntervalEvent> resultBis = new ArrayList<>();
         for (BusyIntervalEvent thisBusyInterval : busyIntervals)
         {
-            if (thisBusyInterval.containsComposition(inTask) == true)
+            if (thisBusyInterval.getOrgBeginTimestamp() <= inTimeStamp)
             {
-                resultArrayList.add(thisBusyInterval);
+                resultBis.add(thisBusyInterval);
             }
         }
-
-        return  resultArrayList;
+        return resultBis;
     }
 
+//    public ArrayList<BusyIntervalEvent> findBusyIntervalsByTask(Task inTask)
+//    {
+//        ArrayList<BusyIntervalEvent> resultArrayList = new ArrayList<>();
+//        for (BusyIntervalEvent thisBusyInterval : busyIntervals)
+//        {
+//            if (thisBusyInterval.containsTaskCheckedByNkValues(inTask) == true)
+//            {
+//                resultArrayList.add(thisBusyInterval);
+//            }
+//        }
+//
+//        return  resultArrayList;
+//    }
+//
 //    public ArrayList<Event> compositionInferencesToEvents() {
 //        ArrayList<Event> resultEvents = new ArrayList<>();
 //        for (BusyIntervalEvent thisBusyInterval : busyIntervals)
@@ -136,4 +150,83 @@ public class BusyIntervalEventContainer {
 //        }
 //        return resultEvents;
 //    }
+
+    public long getEndTime()
+    {
+        long endTime = 0;
+        for (BusyIntervalEvent thisBusyInterval : busyIntervals) {
+            if (thisBusyInterval.getOrgEndTimestamp() > endTime) {
+                endTime = thisBusyInterval.getOrgEndTimestamp();
+            }
+        }
+        return endTime;
+    }
+
+    public long getBeginTime()
+    {
+        long beginTime = 0;
+        Boolean firstLoop = true;
+        for (BusyIntervalEvent thisBusyInterval : busyIntervals) {
+            if (firstLoop == true) {
+                beginTime = thisBusyInterval.getOrgBeginTimestamp();
+                firstLoop = false;
+            }
+
+            beginTime = thisBusyInterval.getOrgBeginTimestamp() < beginTime ? thisBusyInterval.getOrgBeginTimestamp() : beginTime;
+        }
+        return beginTime;
+    }
+
+    public void removeBusyIntervalsBeforeTimeStamp(int inTimeStamp) {
+        ArrayList<BusyIntervalEvent> biBeforeTimeStamp;
+        biBeforeTimeStamp = findBusyIntervalsBeforeTimeStamp(inTimeStamp);
+        for (BusyIntervalEvent thisBi : biBeforeTimeStamp) {
+            busyIntervals.remove(thisBi);
+        }
+    }
+
+    public void removeBusyIntervalsBeforeButExcludeTimeStamp(int inTimeStamp) {
+        ArrayList<BusyIntervalEvent> biBeforeTimeStamp;
+        biBeforeTimeStamp = findBusyIntervalsBeforeTimeStamp(inTimeStamp);
+        for (BusyIntervalEvent thisBi : biBeforeTimeStamp) {
+            if (thisBi.contains(inTimeStamp)) {
+                continue;
+            }
+            busyIntervals.remove(thisBi);
+        }
+    }
+
+    public void removeTheLastBusyInterval() {
+        long lastBeginTime = 0;
+        BusyIntervalEvent lastBi = null;
+        for (BusyIntervalEvent thisBi : busyIntervals) {
+            if (lastBeginTime < thisBi.getOrgBeginTimestamp()) {
+                lastBeginTime = thisBi.getOrgBeginTimestamp();
+                lastBi = thisBi;
+            }
+        }
+        busyIntervals.remove(lastBi);
+    }
+
+//    public ArrayList<TaskInstantEvent> getStartTimeEventsGTByTask(Task inTask) {
+//        ArrayList resultEvents = new ArrayList();
+//        for (BusyIntervalEvent bi : busyIntervals) {
+//            bi.startTimesGroundTruth.sortTaskReleaseEventsByTime();
+//            resultEvents.addAll(bi.startTimesGroundTruth.getEventsOfTask(inTask));
+//        }
+//        return resultEvents;
+//    }
+//
+//    public ArrayList<TaskInstantEvent> getStartTimeEventsInfByTask(Task inTask) {
+//        ArrayList resultEvents = new ArrayList();
+//        for (BusyIntervalEvent bi : busyIntervals) {
+//            bi.startTimesInference.sortTaskReleaseEventsByTime();
+//            resultEvents.addAll(bi.startTimesInference.getEventsOfTask(inTask));
+//        }
+//        return resultEvents;
+//    }
+
+    public int size() {
+        return busyIntervals.size();
+    }
 }

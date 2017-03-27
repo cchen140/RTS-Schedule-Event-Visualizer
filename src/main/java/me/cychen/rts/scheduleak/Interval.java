@@ -1,5 +1,7 @@
 package me.cychen.rts.scheduleak;
 
+import java.util.ArrayList;
+
 /**
  * Created by CY on 7/13/2015.
  */
@@ -96,6 +98,36 @@ public class Interval {
         {
             return false;
         }
+    }
+
+    public Boolean within(Interval inLarger) {
+        if ( (inLarger.begin<=begin) && (inLarger.end>=end) ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public ArrayList<Interval> union(Interval inInterval) {
+        ArrayList<Interval> resultIntervals = new ArrayList<>();
+        if (intersect(inInterval) != null) {
+            // Is continuous.
+
+            long earliestBegin = 0;
+            long latestEnd = 0;
+
+            // Find earliest begin time and latest end time.
+            earliestBegin = inInterval.begin < begin ? inInterval.begin : begin;
+            latestEnd = inInterval.end > end ? inInterval.end : end;
+
+            resultIntervals.add(new Interval(earliestBegin, latestEnd));
+
+        } else {
+            resultIntervals.add(new Interval(this));
+            resultIntervals.add(new Interval(inInterval));
+        }
+
+        return resultIntervals;
     }
 
 }

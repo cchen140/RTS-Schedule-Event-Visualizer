@@ -21,8 +21,12 @@ public class Task {
     protected long period = 0;
     protected long deadline = 0;
 
+    protected long wcet = 0;
+
     protected long execTime = 0;
     protected long execTimeError = 1;  // The error should be positive.
+    protected long execTimeLowerBound = 0;    // Lower bound error
+    protected long execTimeUpperBound = 0;    // Upper bound error
 
     protected int priority = 0;
 
@@ -127,6 +131,31 @@ public class Task {
 
     public void setExecTime(long execTime) {
         this.execTime = execTime;
+
+        if (wcet == 0) {
+            wcet = execTime;
+        }
+
+        /* Deviation */
+        //TODO: This has to be formulated.
+        execTimeLowerBound = (long) (execTime*0.8);
+        execTimeUpperBound = (long) (execTime*1.2);
+    }
+
+    public long getExecTimeLowerBound() {
+        return execTimeLowerBound;
+    }
+
+    public long getExecTimeUpperBound() {
+        return execTimeUpperBound;
+    }
+
+    public long getWcet() {
+        return wcet;
+    }
+
+    public void setWcet(long wcet) {
+        this.wcet = wcet;
     }
 
     @Override
