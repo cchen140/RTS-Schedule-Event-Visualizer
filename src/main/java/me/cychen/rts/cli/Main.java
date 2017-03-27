@@ -3,6 +3,8 @@ package me.cychen.rts.cli;
 import me.cychen.rts.event.BusyIntervalEventContainer;
 import me.cychen.rts.event.EventContainer;
 import me.cychen.rts.framework.TaskSet;
+import me.cychen.rts.scheduleak.IntermittentInterval;
+import me.cychen.rts.scheduleak.ScheduLeakSporadic;
 import me.cychen.rts.scheduleak.restricted.BusyIntervalContainer;
 import me.cychen.rts.scheduleak.restricted.ScheduLeakRestricted;
 import me.cychen.rts.simulator.QuickFixedPrioritySchedulerSimulator;
@@ -47,15 +49,20 @@ public class Main {
         BusyIntervalEventContainer biEvents = new BusyIntervalEventContainer();
         biEvents.createBusyIntervalsFromEvents(eventContainer);
 
-        ScheduLeakRestricted scheduLeakRestricted = new ScheduLeakRestricted(taskSet, new BusyIntervalContainer(biEvents));
-        EventContainer decomposedEvents = scheduLeakRestricted.runDecomposition();
+        //ScheduLeakRestricted scheduLeakRestricted = new ScheduLeakRestricted(taskSet, new BusyIntervalContainer(biEvents));
+        //EventContainer decomposedEvents = scheduLeakRestricted.runDecomposition();
 
         ExcelLogHandler excelLogHandler = new ExcelLogHandler();
         excelLogHandler.genRowSchedulerIntervalEvents(eventContainer);
         excelLogHandler.genRowBusyIntervals(biEvents);
-        excelLogHandler.genRowSchedulerIntervalEvents(decomposedEvents);
+        //excelLogHandler.genRowSchedulerIntervalEvents(decomposedEvents);
         excelLogHandler.saveAndClose(null);
 
         logger.info(eventContainer.getAllEvents());
+
+        ScheduLeakSporadic scheduLeakSporadic = new ScheduLeakSporadic();
+        IntermittentInterval arrivalWindow = scheduLeakSporadic.computeArrivalWindowOfTask(biEvents, taskSet.getTaskById(1));
+
+        logger.info(arrivalWindow.toString());
     }
 }

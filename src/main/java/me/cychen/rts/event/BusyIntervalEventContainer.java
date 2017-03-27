@@ -1,6 +1,7 @@
 package me.cychen.rts.event;
 
 import me.cychen.rts.framework.Task;
+import me.cychen.rts.scheduleak.Interval;
 
 import java.util.ArrayList;
 
@@ -36,7 +37,9 @@ public class BusyIntervalEventContainer {
                 } else { // Start of a busy interval is found.
                     busyIntervalFound = true;
                     beginTimeStamp = currentEvent.getOrgBeginTimestamp();
+                    endTimeStamp = currentEvent.getOrgEndTimestamp();
                     schedulerIntervalEventsInCurrentBI.clear();
+                    schedulerIntervalEventsInCurrentBI.add(currentEvent);
                     continue;
                 }
             }
@@ -45,6 +48,8 @@ public class BusyIntervalEventContainer {
                 endTimeStamp = currentEvent.getOrgBeginTimestamp();
                 //TaskReleaseEventContainer thisBusyIntervalGroundTruth = new TaskReleaseEventContainer();
                 BusyIntervalEvent thisBusyInterval = new BusyIntervalEvent(beginTimeStamp, endTimeStamp);
+                if (beginTimeStamp > endTimeStamp) throw new AssertionError();
+
                 thisBusyInterval.getSchedulerIntervalEvents().addAll(schedulerIntervalEventsInCurrentBI);
 
                 /* Search for the composition of this busy interval. (ground truth) */
@@ -72,6 +77,8 @@ public class BusyIntervalEventContainer {
         if (busyIntervalFound == true) {
             // The last busy interval is not closed, so close it now.
             BusyIntervalEvent thisBusyInterval = new BusyIntervalEvent(beginTimeStamp, endTimeStamp);
+            if (beginTimeStamp > endTimeStamp) throw new AssertionError();
+
             thisBusyInterval.getSchedulerIntervalEvents().addAll(schedulerIntervalEventsInCurrentBI);
             busyIntervals.add(thisBusyInterval);
             busyIntervalFound = false;
@@ -122,6 +129,23 @@ public class BusyIntervalEventContainer {
         {
             if (thisBusyInterval.getOrgBeginTimestamp() <= inTimeStamp)
             {
+                resultBis.add(thisBusyInterval);
+            }
+        }
+        return resultBis;
+    }
+
+    public ArrayList<BusyIntervalEvent> findBusyIntervalsBetweenTimeStamp(long inBegin, long inEnd) {
+        ArrayList<BusyIntervalEvent> resultBis = new ArrayList<>();
+        for (BusyIntervalEvent thisBusyInterval : busyIntervals)
+        {
+            long thisBegin = thisBusyInterval.getOrgBeginTimestamp();
+            long thisEnd = thisBusyInterval.getOrgEndTimestamp();
+
+            Interval thisInterval = new Interval(thisBegin, thisEnd);
+            Interval inInterval = new Interval(inBegin, inEnd);
+
+            if (thisInterval.intersect(inInterval) != null) {
                 resultBis.add(thisBusyInterval);
             }
         }
