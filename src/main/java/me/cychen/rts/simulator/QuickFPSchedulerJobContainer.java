@@ -1,6 +1,8 @@
 package me.cychen.rts.simulator;
 
 import me.cychen.rts.framework.Job;
+import me.cychen.rts.framework.Task;
+
 import java.util.ArrayList;
 
 /**
@@ -79,7 +81,7 @@ public class QuickFPSchedulerJobContainer {
         for ( Job thisJob : jobs ) {
             // Skip the job that is later than the designated time.
             if ( thisJob.releaseTime>timeStamp )
-                continue;
+                 continue;
 
             if ( firstLoop == true ) {
                 firstLoop = false;
@@ -98,5 +100,19 @@ public class QuickFPSchedulerJobContainer {
 
     public int size() {
         return jobs.size();
+    }
+
+    public ArrayList<Job> getJobs() {
+        return jobs;
+    }
+
+    public ArrayList<Job> getTaskJobs(Task inTask) {
+        ArrayList<Job> taskJobs = new ArrayList<>();
+        for (Job thisJob : jobs) {
+            if (thisJob.task == inTask) {
+                taskJobs.add(thisJob);
+            }
+        }
+        return taskJobs;
     }
 }

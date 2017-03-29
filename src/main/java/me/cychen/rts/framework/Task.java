@@ -162,6 +162,7 @@ public class Task {
     public String toString() {
         return "Task-" + id +
                 ": p=" + period +
-                ", c=" + execTime;
+                ", c=" + execTime +
+                ", offset=" + initialOffset;
     }
 }

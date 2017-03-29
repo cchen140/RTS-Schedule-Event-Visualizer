@@ -17,7 +17,9 @@ public class BusyIntervalEventContainer {
         busyIntervals.addAll( inBusyIntervals );
     }
 
-
+    public void add(BusyIntervalEvent inBi) {
+        busyIntervals.add(inBi);
+    }
 
     public Boolean createBusyIntervalsFromEvents(EventContainer inEventContainer) {
         ArrayList<SchedulerIntervalEvent> schedulerEvents = inEventContainer.getSchedulerEvents();
@@ -122,7 +124,7 @@ public class BusyIntervalEventContainer {
         return null;
     }
 
-    public ArrayList<BusyIntervalEvent> findBusyIntervalsBeforeTimeStamp(int inTimeStamp)
+    public ArrayList<BusyIntervalEvent> findBusyIntervalsBeforeTimeStamp(long inTimeStamp)
     {
         ArrayList<BusyIntervalEvent> resultBis = new ArrayList<>();
         for (BusyIntervalEvent thisBusyInterval : busyIntervals)
@@ -209,7 +211,7 @@ public class BusyIntervalEventContainer {
         }
     }
 
-    public void removeBusyIntervalsBeforeButExcludeTimeStamp(int inTimeStamp) {
+    public void removeBusyIntervalsBeforeButExcludeTimeStamp(long inTimeStamp) {
         ArrayList<BusyIntervalEvent> biBeforeTimeStamp;
         biBeforeTimeStamp = findBusyIntervalsBeforeTimeStamp(inTimeStamp);
         for (BusyIntervalEvent thisBi : biBeforeTimeStamp) {

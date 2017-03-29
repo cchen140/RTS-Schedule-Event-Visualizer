@@ -2,15 +2,13 @@ package me.cychen.rts.cli;
 
 import me.cychen.rts.event.BusyIntervalEventContainer;
 import me.cychen.rts.event.EventContainer;
+import me.cychen.rts.framework.Task;
 import me.cychen.rts.framework.TaskSet;
-import me.cychen.rts.scheduleak.IntermittentInterval;
-import me.cychen.rts.scheduleak.ScheduLeakSporadic;
-import me.cychen.rts.scheduleak.restricted.BusyIntervalContainer;
-import me.cychen.rts.scheduleak.restricted.ScheduLeakRestricted;
+import me.cychen.rts.scheduleak.*;
+import me.cychen.rts.simulator.QuickFPSchedulerJobContainer;
 import me.cychen.rts.simulator.QuickFixedPrioritySchedulerSimulator;
 import me.cychen.rts.simulator.TaskSetContainer;
 import me.cychen.rts.simulator.TaskSetGenerator;
-import me.cychen.rts.util.ExcelLogHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,6 +16,8 @@ import org.apache.logging.log4j.Logger;
  * Created by jjs on 2/13/17.
  */
 public class Main {
+    static long SIM_DURATION = 10000;
+
     private static final Logger logger = LogManager.getLogger("Main");
 
     public static void main(String[] args) {
@@ -26,43 +26,69 @@ public class Main {
         // Generate a task set.
         TaskSetGenerator taskSetGenerator = new TaskSetGenerator();
 
-        taskSetGenerator.setMaxPeriod(100);
-        taskSetGenerator.setMinPeriod(50);
+        //taskSetGenerator.setMaxPeriod(100);
+        //taskSetGenerator.setMinPeriod(50);
 
-        taskSetGenerator.setMaxExecTime(20);
-        taskSetGenerator.setMinExecTime(5);
+        //taskSetGenerator.setMaxExecTime(20);
+        //taskSetGenerator.setMinExecTime(5);
 
-        taskSetGenerator.setMaxUtil(0.5);
-        taskSetGenerator.setMinUtil(0.4);
-        TaskSetContainer taskSets = taskSetGenerator.generate(5, 1);
-        TaskSet taskSet = taskSets.getTaskSets().get(0);
-        logger.info(taskSet.toString());
+        taskSetGenerator.setMaxUtil(0.9);
+        taskSetGenerator.setMinUtil(0.1);
+        TaskSetContainer taskSets = taskSetGenerator.generate(15, 10000);
 
-        // New and configure a RM scheduling simulator.
-        QuickFixedPrioritySchedulerSimulator rmSimulator = new QuickFixedPrioritySchedulerSimulator();
-        rmSimulator.setTaskSet(taskSet);
+        DistributionMap matchedPeriodDistribution = new DistributionMap();
 
-        // Run simulation.
-        rmSimulator.runSim(16380);
-        EventContainer eventContainer = rmSimulator.getSimEventContainer();
+        long successfulInferenceCount = 0;
+        long successfulVictimHighestPriorityCount = 0;
+        for (TaskSet thisTaskSet : taskSets.getTaskSets()) {
+            //logger.info(thisTaskSet.toString());
 
-        BusyIntervalEventContainer biEvents = new BusyIntervalEventContainer();
-        biEvents.createBusyIntervalsFromEvents(eventContainer);
+            // New and configure a RM scheduling simulator.
+            QuickFixedPrioritySchedulerSimulator rmSimulator = new QuickFixedPrioritySchedulerSimulator();
+            rmSimulator.setTaskSet(thisTaskSet);
 
-        //ScheduLeakRestricted scheduLeakRestricted = new ScheduLeakRestricted(taskSet, new BusyIntervalContainer(biEvents));
-        //EventContainer decomposedEvents = scheduLeakRestricted.runDecomposition();
+            Task victimTask = thisTaskSet.getTaskById(5);
+            //Task victimTask = thisTaskSet.getHighestPriorityTask();
 
-        ExcelLogHandler excelLogHandler = new ExcelLogHandler();
-        excelLogHandler.genRowSchedulerIntervalEvents(eventContainer);
-        excelLogHandler.genRowBusyIntervals(biEvents);
-        //excelLogHandler.genRowSchedulerIntervalEvents(decomposedEvents);
-        excelLogHandler.saveAndClose(null);
+            // Pre-schedule
+            QuickFPSchedulerJobContainer simJobContainer = rmSimulator.preSchedule(SIM_DURATION);
 
-        logger.info(eventContainer.getAllEvents());
+            // New Sporadic ScheduLeak
+            ScheduLeakSporadic scheduLeakSporadic = new ScheduLeakSporadic();
+            long victimTaskSmallestExecutionTime = scheduLeakSporadic.findTaskSmallestJobExecutionTime(simJobContainer, victimTask);
+            //logger.info("Victim task's smallest C = " + victimTaskSmallestExecutionTime);
 
-        ScheduLeakSporadic scheduLeakSporadic = new ScheduLeakSporadic();
-        IntermittentInterval arrivalWindow = scheduLeakSporadic.computeArrivalWindowOfTask(biEvents, taskSet.getTaskById(1));
+            // Run simulation.
+            rmSimulator.simJobs(simJobContainer);
+            EventContainer eventContainer = rmSimulator.getSimEventContainer();
 
-        logger.info(arrivalWindow.toString());
+            // Build busy intervals for ScheduLeak
+            BusyIntervalEventContainer biEvents = new BusyIntervalEventContainer();
+            biEvents.createBusyIntervalsFromEvents(eventContainer);
+            biEvents.removeBusyIntervalsBeforeButExcludeTimeStamp(victimTask.getInitialOffset());
+            //biEvents.removeTheLastBusyInterval();
+
+            /* Run ScheduLeak */
+            TaskArrivalWindow arrivalWindow;
+            if (scheduLeakSporadic.computeArrivalWindowOfTaskByIntersection(biEvents, victimTask, new Interval(victimTask.getInitialOffset(), victimTask.getInitialOffset()+victimTaskSmallestExecutionTime), SIM_DURATION)) {
+                //logger.info("Arrival window matched! " + scheduLeakSporadic.getProcessedPeriodCount());
+                successfulInferenceCount++;
+
+                matchedPeriodDistribution.touch(scheduLeakSporadic.getProcessedPeriodCount());
+
+                if (victimTask.getPriority() == 1) {
+                    successfulVictimHighestPriorityCount++;
+                }
+            }
+            //arrivalWindow = scheduLeakSporadic.getTaskArrivalWindow();
+            //logger.info(arrivalWindow.toString());
+
+        }
+
+        logger.info("Successful Inference: " + successfulInferenceCount);
+        logger.info(" - Highest Priority Victim: " + successfulVictimHighestPriorityCount);
+        logger.info("Distribution: \r\n" + matchedPeriodDistribution.toString());
+
+
     }
 }

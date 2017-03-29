@@ -105,20 +105,15 @@ public class IntermittentInterval {
         // Check which intervals are intersected.
         ArrayList<Interval> intersectedIntervals = new ArrayList<>();
         for (Interval thisInterval : intervals) {
-            if (thisInterval.intersect(inInterval) != null) {
-                intersectedIntervals.add(thisInterval);
+            Interval thisIntersectedInterval = thisInterval.intersect(inInterval);
+            if (thisIntersectedInterval != null) {
+                intersectedIntervals.add(thisIntersectedInterval);
             }
         }
 
         // Create new intersected interval if there is any intersection.
         if (intersectedIntervals.size() > 0) {
-            IntermittentInterval resultIntervals = new IntermittentInterval(intervals);
-            resultIntervals.intervals.removeAll(intersectedIntervals);
-
-            for (Interval thisInterval : intersectedIntervals) {
-                resultIntervals.intervals.add(thisInterval.intersect(inInterval));
-            }
-            return resultIntervals;
+            return new IntermittentInterval(intersectedIntervals);
         } else {
             // return empty interval.
             return new IntermittentInterval();
@@ -133,10 +128,22 @@ public class IntermittentInterval {
         return resultInterInterval;
     }
 
+    public Boolean hasInterval(Interval inInterval) {
+        for (Interval thisInterval : intervals) {
+            if (thisInterval.isEqual(inInterval)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public String toString() {
-        return "IntermittentInterval{" +
-                "interval size =" + intervals.size() +
-                '}';
+        String outputStr = "";
+        outputStr += "Interval Count = " + intervals.size() + "\r\n";
+        for (Interval thisInterval : intervals) {
+            outputStr += "\t" + thisInterval.toString() + "\r\n";
+        }
+        return outputStr;
     }
 }

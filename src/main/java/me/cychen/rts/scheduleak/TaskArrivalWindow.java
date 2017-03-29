@@ -1,6 +1,9 @@
 package me.cychen.rts.scheduleak;
 
+import me.cychen.rts.event.SchedulerIntervalEvent;
 import me.cychen.rts.framework.Task;
+
+import java.util.ArrayList;
 
 /**
  * Created by cy on 3/27/2017.
@@ -33,5 +36,28 @@ public class TaskArrivalWindow extends IntermittentInterval {
         }
 
         shift( shiftFactor * task.getPeriod() );
+    }
+
+    public ArrayList<SchedulerIntervalEvent> getArrivalWindowEventByTime(long inTime) {
+        ArrayList<SchedulerIntervalEvent> resultArrivalWindowEvents = new ArrayList<>();
+
+        shiftToClosestPoint(inTime);
+        for (Interval thisInterval : intervals) {
+            resultArrivalWindowEvents.add(new SchedulerIntervalEvent(thisInterval.getBegin(), thisInterval.getEnd(), task, ""));
+        }
+
+        return resultArrivalWindowEvents;
+    }
+
+    public Boolean hasMatchedArrivalWindow(Interval inInterval) {
+        long orgBegin = getBegin();
+        Boolean isMatched = false;
+        shiftToClosestPoint(inInterval.getBegin());
+        isMatched = hasInterval(inInterval);
+
+        // restore offset.
+        shiftToClosestPoint(orgBegin);
+
+        return isMatched;
     }
 }

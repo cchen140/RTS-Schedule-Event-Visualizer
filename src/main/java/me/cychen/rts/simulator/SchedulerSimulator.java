@@ -65,8 +65,7 @@ abstract class SchedulerSimulator {
         //taskSet.removeIdleTask();
         //taskSet.clearSimData();
 
-        setTaskSetHook(); // It doesn't (shouldn't) include the idle task.
-        //taskSet.addTask(Task.IDLE_TASK_ID, "IDLE", Task.TASK_TYPE_IDLE, 0, 0, 0, 0);
+        setTaskSetHook(); // Note that the task set includes idle task.
 
         // Clear previous event container if any
         simEventContainer.clearAll();

@@ -130,4 +130,16 @@ public class Interval {
         return resultIntervals;
     }
 
+    public Boolean isEqual(Interval inInterval) {
+        if ( (begin==inInterval.getBegin()) && (end==inInterval.getEnd()) ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "[" + begin + ", " + end + "] => " + getLength();
+    }
 }

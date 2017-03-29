@@ -22,6 +22,7 @@ import java.io.IOException;
  * Created by cy on 3/25/2017.
  */
 public class ExcelLogHandler {
+    private static int EXCEL_COLUMN_LIMIT = 16380;
     private static String DEFAULT_XLSX_FILE_PATH = "out.xlsx";
     XSSFWorkbook workbook;
     XSSFSheet sheet;
@@ -51,8 +52,12 @@ public class ExcelLogHandler {
 
         for (SchedulerIntervalEvent thisScheduleEvent : inEvents.getSchedulerEvents()) {
             for (long i=thisScheduleEvent.getOrgBeginTimestamp(); i<thisScheduleEvent.getOrgEndTimestamp(); i++) {
-                Cell cell = row.createCell((int)(i+columnOffset));
-                cell.setCellValue(thisScheduleEvent.getTask().getId());
+                if (i+columnOffset > EXCEL_COLUMN_LIMIT) {
+                    // Display nothing as it exceeds excel's display limit.
+                } else {
+                    Cell cell = row.createCell((int) (i + columnOffset));
+                    cell.setCellValue(thisScheduleEvent.getTask().getId());
+                }
             }
         }
     }
@@ -65,8 +70,12 @@ public class ExcelLogHandler {
 
         for (BusyIntervalEvent thisBi : inBis.getBusyIntervals()) {
             for (long i=thisBi.getOrgBeginTimestamp(); i<thisBi.getOrgEndTimestamp(); i++) {
-                Cell cell = row.createCell((int)(i+columnOffset));
-                cell.setCellValue("B");
+                if (i+columnOffset > EXCEL_COLUMN_LIMIT) {
+                    // Display nothing as it exceeds excel's display limit.
+                } else {
+                    Cell cell = row.createCell((int) (i + columnOffset));
+                    cell.setCellValue("B");
+                }
             }
         }
     }

@@ -395,6 +395,36 @@ public class TaskSet {
         return resultUtil;
     }
 
+    public Task getLowestPriorityTask() {
+        Task lowestPriorityTask = null;
+        Boolean firstLoop = true;
+        for (Task thisTask : getAppTasksAsArray()) {
+            if (firstLoop) {
+                lowestPriorityTask = thisTask;
+                firstLoop = false;
+            }
+
+            // Note: the bigger the smaller priority
+            lowestPriorityTask = thisTask.getPriority()>lowestPriorityTask.getPriority() ? thisTask : lowestPriorityTask;
+        }
+        return lowestPriorityTask;
+    }
+
+    public Task getHighestPriorityTask() {
+        Task highestPriorityTask = null;
+        Boolean firstLoop = true;
+        for (Task thisTask : getAppTasksAsArray()) {
+            if (firstLoop) {
+                highestPriorityTask = thisTask;
+                firstLoop = false;
+            }
+
+            // Note: the bigger the smaller priority
+            highestPriorityTask = thisTask.getPriority()<highestPriorityTask.getPriority() ? thisTask : highestPriorityTask;
+        }
+        return highestPriorityTask;
+    }
+
     @Override
     public String toString() {
         String outStr = "TaskSet(" + getUtilization() + "):\r\n";
