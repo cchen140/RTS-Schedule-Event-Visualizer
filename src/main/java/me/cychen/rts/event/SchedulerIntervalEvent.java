@@ -50,6 +50,14 @@ public class SchedulerIntervalEvent extends IntervalEvent {
         }
     }
 
+    public int getBeginTimeScheduleState() {
+        return beginTimeScheduleState;
+    }
+
+    public int getEndTimeScheduleState() {
+        return endTimeScheduleState;
+    }
+
     public Task getTask() { return task; }
 
     @Override

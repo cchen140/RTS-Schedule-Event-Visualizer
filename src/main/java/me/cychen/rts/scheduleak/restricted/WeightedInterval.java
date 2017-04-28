@@ -10,6 +10,7 @@ import java.util.HashMap;
  * Created by dogs0 on 9/27/2016.
  * This class does not support shifting or adjustment on begin and end times.
  */
+@Deprecated
 public class WeightedInterval extends Interval {
     HashMap<Long, Integer> weightMap = new HashMap<>();
 

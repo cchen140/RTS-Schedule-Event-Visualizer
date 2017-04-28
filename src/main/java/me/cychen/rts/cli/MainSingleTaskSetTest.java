@@ -5,6 +5,7 @@ import me.cychen.rts.event.EventContainer;
 import me.cychen.rts.event.SchedulerIntervalEvent;
 import me.cychen.rts.framework.Task;
 import me.cychen.rts.framework.TaskSet;
+import me.cychen.rts.scheduleak.DistributionMap;
 import me.cychen.rts.scheduleak.Interval;
 import me.cychen.rts.scheduleak.ScheduLeakSporadic;
 import me.cychen.rts.scheduleak.TaskArrivalWindow;
@@ -20,7 +21,7 @@ import org.apache.logging.log4j.Logger;
  * Created by cy on 3/28/2017.
  */
 public class MainSingleTaskSetTest {
-    static long SIM_DURATION = 10000;
+    static long SIM_DURATION = 100000;
 
     private static final Logger logger = LogManager.getLogger("MainSingleTaskSetTest");
 
@@ -41,7 +42,15 @@ public class MainSingleTaskSetTest {
         TaskSetContainer taskSets = taskSetGenerator.generate(15, 1);
 
         TaskSet taskSet = taskSets.getTaskSets().get(0);
-        Task victimTask = taskSet.getTaskById(1);
+
+        // victim
+        Task victimTask = taskSet.getOneTaskByPriority(6);
+        logger.info("Victim Task: " + victimTask.toString());
+
+        // observer task
+        Task observerTask = taskSet.getOneTaskByPriority(1 );
+        logger.info("Observer Task: " + observerTask.toString());
+
         logger.info(taskSet.toString());
         long taskSetHyperPeriod = taskSet.calHyperPeriod();
         logger.info("Task Hyper-period: " + taskSetHyperPeriod);
@@ -67,13 +76,24 @@ public class MainSingleTaskSetTest {
         biEvents.createBusyIntervalsFromEvents(eventContainer);
         biEvents.removeBusyIntervalsBeforeButExcludeTimeStamp(victimTask.getInitialOffset());
 
+        // Get only observable busy intervals
+        BusyIntervalEventContainer observedBiEvents =
+                new BusyIntervalEventContainer( biEvents.getObservableBusyIntervalsByTask(observerTask) );
+
+
         /* Run ScheduLeak */
+        /* intersection
         TaskArrivalWindow arrivalWindow;
         if (scheduLeakSporadic.computeArrivalWindowOfTaskByIntersection(biEvents, victimTask, new Interval(victimTask.getInitialOffset(), victimTask.getInitialOffset() + victimTaskSmallestExecutionTime), SIM_DURATION)) {
             logger.info("Arrival window matched! " + scheduLeakSporadic.getProcessedPeriodCount());
         }
         arrivalWindow = scheduLeakSporadic.getTaskArrivalWindow();
         logger.info(arrivalWindow.toString());
+        */
+
+        /* distribution map */
+        DistributionMap taskExecutionDistribution = scheduLeakSporadic.computeExecutionDistributionByTaskPeriod(observedBiEvents, victimTask);
+        logger.info("\r\n" + taskExecutionDistribution.toString());
 
         //ScheduLeakRestricted scheduLeakRestricted = new ScheduLeakRestricted(taskSet, new BusyIntervalContainer(biEvents));
         //EventContainer decomposedEvents = scheduLeakRestricted.runDecomposition();
@@ -83,17 +103,23 @@ public class MainSingleTaskSetTest {
 
         excelLogHandler.genRowSchedulerIntervalEvents(eventContainer);
         excelLogHandler.genRowBusyIntervals(biEvents);
+        excelLogHandler.genRowBusyIntervals(observedBiEvents);
         //excelLogHandler.genRowSchedulerIntervalEvents(decomposedEvents);
 
         // Output inferred arrival window
+        /*
         EventContainer arrivalWindowEventContainer = new EventContainer();
         for (SchedulerIntervalEvent thisEvent : arrivalWindow.getArrivalWindowEventByTime(0)) {
             arrivalWindowEventContainer.add(thisEvent);
         }
         excelLogHandler.genRowSchedulerIntervalEvents(arrivalWindowEventContainer);
+        */
 
         excelLogHandler.saveAndClose(null);
 
+        logger.info("The number of observed BIs: " + observedBiEvents.size());
+
         logger.info(eventContainer.getAllEvents());
+
     }
 }

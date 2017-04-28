@@ -7,6 +7,7 @@ import java.util.ArrayList;
 /**
  * Created by CY on 10/31/2015.
  */
+@Deprecated
 public class ArrivalSegment extends Interval {
     public static final int ZERO_ARRIVAL_SEGMENT = 0;
     public static final int ONE_ARRIVAL_SEGMENT = 1;

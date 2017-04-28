@@ -8,6 +8,7 @@ import java.util.ArrayList;
 /**
  * Created by CY on 5/26/2015.
  */
+@Deprecated
 public class BusyIntervalContainer {
     ArrayList<BusyInterval> busyIntervals = new ArrayList<BusyInterval>();
 

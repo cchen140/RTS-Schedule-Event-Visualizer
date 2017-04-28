@@ -8,6 +8,7 @@ import java.util.ArrayList;
 /**
  * Created by CY on 10/31/2015.
  */
+@Deprecated
 public class ArrivalSegmentsContainer {
     /* inputs from constructor */
     private BusyIntervalContainer biContainer;

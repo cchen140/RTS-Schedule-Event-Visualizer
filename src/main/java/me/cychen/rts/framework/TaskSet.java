@@ -425,6 +425,15 @@ public class TaskSet {
         return highestPriorityTask;
     }
 
+    public Task getOneTaskByPriority(int inPriority) {
+        for (Task thisTask : tasks.values()) {
+            if (thisTask.getPriority() == inPriority) {
+                return thisTask;
+            }
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         String outStr = "TaskSet(" + getUtilization() + "):\r\n";

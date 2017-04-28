@@ -14,6 +14,7 @@ import java.util.HashMap;
 /**
  * Created by CY on 5/21/2015.
  */
+@Deprecated
 public class BusyInterval {
     private long beginTimeStampNs = 0;
     private long endTimeStampNs = 0;

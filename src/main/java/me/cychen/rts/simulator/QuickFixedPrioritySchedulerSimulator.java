@@ -205,13 +205,13 @@ public class QuickFixedPrioritySchedulerSimulator extends SchedulerSimulator {
                 }
 
                 //if ( (int)currentJob.remainingExecTime == currentRunTask.getComputationTimeNs() ) {
-                if ( currentJob.hasStarted == false ) {
-                    currentJob.hasStarted = true;
-                    TaskInstantEvent thisReleaseEvent = new TaskInstantEvent((int) currentJob.releaseTime, currentRunTask, 0, "BEGIN");
-                    simEventContainer.add(thisReleaseEvent);
-                    //resultSchedulingEvents.addNextEvent(thisReleaseEvent);
-                    //bi.startTimesInference.addNextEvent(thisReleaseEvent);
-                }
+//                if ( currentJob.hasStarted == false ) {
+//                    currentJob.hasStarted = true;
+//                    TaskInstantEvent thisReleaseEvent = new TaskInstantEvent((int) currentJob.releaseTime, currentRunTask, 0, "BEGIN");
+//                    simEventContainer.add(thisReleaseEvent);
+//                    //resultSchedulingEvents.addNextEvent(thisReleaseEvent);
+//                    //bi.startTimesInference.addNextEvent(thisReleaseEvent);
+//                }
 
                 continue;
             }

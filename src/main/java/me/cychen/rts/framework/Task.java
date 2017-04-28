@@ -163,6 +163,7 @@ public class Task {
         return "Task-" + id +
                 ": p=" + period +
                 ", c=" + execTime +
+                ", pri=" + priority +
                 ", offset=" + initialOffset;
     }
 }

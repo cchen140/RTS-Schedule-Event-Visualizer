@@ -35,6 +35,29 @@ public class ScheduLeakSporadic {
         return processedPeriodCount;
     }
 
+    public DistributionMap computeExecutionDistributionByTaskPeriod(BusyIntervalEventContainer inBiContainer, Task inTask) {
+        long beginTimeStampe = inBiContainer.getBeginTime();
+        long endTimeStamp = inBiContainer.getEndTime();
+
+        DistributionMap executionMap = new DistributionMap();
+        Interval baseTaskPeriodInterval = new Interval(0, inTask.getPeriod());
+
+        // Compute the offset factor for the first busy interval
+        long initialPeriodFactor = beginTimeStampe/inTask.getPeriod();
+        for (long periodFactor=initialPeriodFactor; periodFactor*inTask.getPeriod()<=endTimeStamp; periodFactor++) {
+            long thisPeriodBeginTime = periodFactor*inTask.getPeriod();
+            for (BusyIntervalEvent thisBi : inBiContainer.findBusyIntervalsBetweenTimeStamp(thisPeriodBeginTime, thisPeriodBeginTime+inTask.getPeriod())) {
+                Interval thisInterval = new Interval(thisBi.getOrgBeginTimestamp(), thisBi.getOrgEndTimestamp());
+                thisInterval.shift(-thisPeriodBeginTime);
+
+                // Trim the shifted busy interval and update the execution distribution.
+                executionMap.touchInterval(baseTaskPeriodInterval.intersect(thisInterval));
+            }
+        }
+
+        return executionMap;
+    }
+
     /* This function processes through every period within given busy intervals. */
     public TaskArrivalWindow computeArrivalWindowOfTaskByIntersection(BusyIntervalEventContainer inBiContainer, Task inTask) {
         TaskArrivalWindow taskArrivalWindow = new TaskArrivalWindow(inTask);

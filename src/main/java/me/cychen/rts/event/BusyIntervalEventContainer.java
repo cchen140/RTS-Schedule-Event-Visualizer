@@ -154,6 +154,45 @@ public class BusyIntervalEventContainer {
         return resultBis;
     }
 
+    public ArrayList<BusyIntervalEvent> getObservableBusyIntervalsByTask(Task inTask) {
+        ArrayList<BusyIntervalEvent> observedBis = new ArrayList<>();
+        for (BusyIntervalEvent thisBi : busyIntervals) {
+            BusyIntervalEvent observedBi = null;
+            Boolean isConstructingBi = false;
+            for (SchedulerIntervalEvent thisEvent : thisBi.getSchedulerIntervalEvents()) {
+                if (thisEvent.getTask() == inTask) {
+
+                    // handling the last constructing busy interval.
+                    if (isConstructingBi == true) {
+                        // It should be the end of an observable busy interval.
+                        if (thisEvent.getBeginTimeScheduleState() != SchedulerIntervalEvent.SCHEDULE_STATE_RESUME)
+                            throw new AssertionError();
+
+                        observedBis.add(observedBi);
+                    }
+
+                    // Handling the situation after this schedule interval
+                    if (thisEvent.getEndTimeScheduleState() == SchedulerIntervalEvent.SCHEDULE_STATE_SUSPEND) {
+                        // We are preempted again.
+                        observedBi = new BusyIntervalEvent();
+                        isConstructingBi = true;
+                    } else {
+                        // The end of the observer task.
+                        if (thisEvent.getEndTimeScheduleState() != SchedulerIntervalEvent.SCHEDULE_STATE_END)
+                            throw new AssertionError();
+
+                        isConstructingBi = false;
+                    }
+
+                } else if (isConstructingBi == true) {
+                    observedBi.addIntervalEvent(thisEvent);
+                }
+            }
+        }
+
+        return observedBis;
+    }
+
 //    public ArrayList<BusyIntervalEvent> findBusyIntervalsByTask(Task inTask)
 //    {
 //        ArrayList<BusyIntervalEvent> resultArrayList = new ArrayList<>();
