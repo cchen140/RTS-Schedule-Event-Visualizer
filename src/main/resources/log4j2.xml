@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="INFO">
+<Configuration status="WARN">
+    <!--<ThresholdFilter level="INFO"/>-->
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
@@ -7,22 +8,22 @@
         <File name="MainLogFile" fileName="main.log" immediateFlush="false" append="false">
             <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
-        <File name="ExpLogFile1" fileName="exp1.log" immediateFlush="false" append="false">
+        <File name="ExpLogFile1" fileName="exp1.log" immediateFlush="true" append="false">
             <PatternLayout pattern="%msg"/>
         </File>
-        <File name="ExpLogFile2" fileName="exp2.log" immediateFlush="false" append="false">
+        <File name="ExpLogFile2" fileName="exp2.log" immediateFlush="true" append="false">
             <PatternLayout pattern="%msg"/>
         </File>
     </Appenders>
     <Loggers>
-        <Root level="debug">
+        <Root level="error">
             <AppenderRef ref="Console" />
             <AppenderRef ref="MainLogFile"/>
         </Root>
-        <Logger name="exp1" level="trace">
+        <Logger name="exp1" level="TRACE">
             <AppenderRef ref="ExpLogFile1"/>
         </Logger>
-        <Logger name="exp2" level="trace">
+        <Logger name="exp2" level="TRACE">
             <AppenderRef ref="ExpLogFile2"/>
         </Logger>
     </Loggers>

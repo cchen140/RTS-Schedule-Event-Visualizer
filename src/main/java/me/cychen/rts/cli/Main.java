@@ -18,7 +18,12 @@ import org.apache.logging.log4j.Logger;
 public class Main {
     static long SIM_DURATION = 10000;
 
-    private static final Logger logger = LogManager.getLogger("Main");
+    private static final int VICTIM_PRI = 3;
+    private static final int OBSERVER_PRI = 1;
+    private static final int NUM_OF_TASKS = 15;
+    private static final int NUM_OF_TASK_SETS = 100;
+
+        private static final Logger logger = LogManager.getLogger("Main");
     private static final Logger loggerExp2 = LogManager.getLogger("exp2");
 
 
@@ -36,7 +41,7 @@ public class Main {
 
         //taskSetGenerator.setMaxExecTime(20);
         //taskSetGenerator.setMinExecTime(5);
-for (double u = 0.1; u<=0.91; u+=0.1) {
+for (double u = 0.0; u<=0.91; u+=0.1) {
     taskSetGenerator.setMaxUtil(u + 0.09);
     taskSetGenerator.setMinUtil(u);
 
@@ -48,10 +53,10 @@ for (double u = 0.1; u<=0.91; u+=0.1) {
         /* Optimal attack condition experiment. */
     taskSetGenerator.setNeedGenObserverTask(true);
     //taskSetGenerator.setNeedGenBadObserverTask(true);
-    taskSetGenerator.setObserverTaskPriority(5);
-    taskSetGenerator.setVictimTaskPriority(10);
+    taskSetGenerator.setObserverTaskPriority(VICTIM_PRI);
+    taskSetGenerator.setVictimTaskPriority(OBSERVER_PRI);
 
-    TaskSetContainer taskSets = taskSetGenerator.generate(15, 5);
+    TaskSetContainer taskSets = taskSetGenerator.generate(NUM_OF_TASKS, NUM_OF_TASK_SETS);
 
     DistributionMap matchedPeriodDistribution = new DistributionMap();
 
@@ -61,8 +66,8 @@ for (double u = 0.1; u<=0.91; u+=0.1) {
         //logger.info(thisTaskSet.toString());
 
         // victim and observer task
-        Task victimTask = thisTaskSet.getOneTaskByPriority(10);
-        Task observerTask = thisTaskSet.getOneTaskByPriority(5);
+        Task victimTask = thisTaskSet.getOneTaskByPriority(VICTIM_PRI);
+        Task observerTask = thisTaskSet.getOneTaskByPriority(OBSERVER_PRI);
 
         // Upper bound
         long observationUpperBound_1 = ScheduLeakSporadic.computeObservationUpperBound_1(thisTaskSet, observerTask, victimTask);
@@ -122,7 +127,7 @@ for (double u = 0.1; u<=0.91; u+=0.1) {
         //arrivalWindow = scheduLeakSporadic.getTaskArrivalWindow();
         //logger.info(arrivalWindow.toString());
 
-        loggerExp2.trace("\n" + thisTaskSet.getUtilization() + "\t" + scheduLeakSporadic.foundPeriodFactor + "\t" + observationUpperBound_1 + "\t" + scheduLeakSporadic.foundPeriodFactor / (double) observationUpperBound_1);
+        loggerExp2.trace("\n" + thisTaskSet.getUtilization() + "\t" + scheduLeakSporadic.foundPeriodFactor + "\t" + victimTask.getPeriod() + "\t" + observationUpperBound_1 + "\t" + (scheduLeakSporadic.foundPeriodFactor*victimTask.getPeriod()) / (double) observationUpperBound_1);
 
     }
 }
