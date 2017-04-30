@@ -162,6 +162,7 @@ public class TaskSetGenerator {
         ArrayList<Double> utilDistribution = getRandomUtilDistribution(numTasks, randomUtil);
 
         double total_util = 0;
+        double last_total_util = 0;
         for (int i = 0; i < numTasks; i++)
         {
             Task task = new Task();
@@ -229,6 +230,7 @@ public class TaskSetGenerator {
             //task.setComputationTimeNs(tempComputationTime - tempComputationTime % 100_000);
             task.setExecTime(tempComputationTime);
 
+            last_total_util = total_util;
             total_util += ( task.getExecTime() / (double)(task.getPeriod()));
 
             task.setTaskType(Task.TASK_TYPE_APP);
@@ -245,10 +247,13 @@ public class TaskSetGenerator {
                 if (taskContainer.hasHarmonicPeriods() == true) {
                     taskContainer.removeTask(task);
                     i--;
+                    total_util = last_total_util;
                     continue;
                 }
             }
         }
+
+        last_total_util = taskContainer.getUtilization();
 
         if (total_util>1)
             return null;

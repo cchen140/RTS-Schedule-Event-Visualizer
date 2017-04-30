@@ -21,7 +21,10 @@ public class Main {
     private static final Logger logger = LogManager.getLogger("Main");
     private static final Logger loggerExp2 = LogManager.getLogger("exp2");
 
+
     public static void main(String[] args) {
+        int errorCount = 0;
+
         logger.info("Test starts.");
         loggerExp2.trace("\n");
 
@@ -33,7 +36,7 @@ public class Main {
 
         //taskSetGenerator.setMaxExecTime(20);
         //taskSetGenerator.setMinExecTime(5);
-for (double u = 0.1; u<1; u+=0.1) {
+for (double u = 0.1; u<=0.91; u+=0.1) {
     taskSetGenerator.setMaxUtil(u + 0.09);
     taskSetGenerator.setMinUtil(u);
 
@@ -48,7 +51,7 @@ for (double u = 0.1; u<1; u+=0.1) {
     taskSetGenerator.setObserverTaskPriority(5);
     taskSetGenerator.setVictimTaskPriority(10);
 
-    TaskSetContainer taskSets = taskSetGenerator.generate(15, 10);
+    TaskSetContainer taskSets = taskSetGenerator.generate(15, 5);
 
     DistributionMap matchedPeriodDistribution = new DistributionMap();
 
@@ -70,6 +73,8 @@ for (double u = 0.1; u<1; u+=0.1) {
         if (observationUpperBound_1 > 1000000) {
             continue;
         } else if (observationUpperBound_1 <= 0) {
+            errorCount++;
+            //logger.error("Negative upper bound!");
             continue;
         }
 
@@ -117,7 +122,7 @@ for (double u = 0.1; u<1; u+=0.1) {
         //arrivalWindow = scheduLeakSporadic.getTaskArrivalWindow();
         //logger.info(arrivalWindow.toString());
 
-        loggerExp2.trace("\n" + thisTaskSet.getUtilization() + "\t" + observationUpperBound_1 + "\t" + scheduLeakSporadic.foundPeriodFactor + "\t" + scheduLeakSporadic.foundPeriodFactor / (double) observationUpperBound_1);
+        loggerExp2.trace("\n" + thisTaskSet.getUtilization() + "\t" + scheduLeakSporadic.foundPeriodFactor + "\t" + observationUpperBound_1 + "\t" + scheduLeakSporadic.foundPeriodFactor / (double) observationUpperBound_1);
 
     }
 }
@@ -125,6 +130,7 @@ for (double u = 0.1; u<1; u+=0.1) {
 //        logger.info(" - Highest Priority Victim: " + successfulVictimHighestPriorityCount);
 //        logger.info("Distribution: \r\n" + matchedPeriodDistribution.toString());
         logger.info("Finished.");
+        logger.error("Negative upper bound: " + errorCount);
 
     }
 }
