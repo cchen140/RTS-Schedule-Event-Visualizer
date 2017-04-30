@@ -198,6 +198,18 @@ public class TaskSet {
 
     public int size() { return tasks.size(); }
 
+    public ArrayList<Task> getHigherPriorityTasks(int inPriority)
+    {
+        ArrayList<Task> higherPriorityTask = new ArrayList<Task>();
+        for (Task thisTask: tasks.values())
+        {
+            if ((thisTask.getTaskType()==Task.TASK_TYPE_APP) && (thisTask.getPriority()>inPriority))
+            {
+                higherPriorityTask.add(thisTask);
+            }
+        }
+        return higherPriorityTask;
+    }
 
     public Task getTaskByName( String inName ) {
         for (Task thisTask : getTasksAsArray()) {
@@ -404,8 +416,8 @@ public class TaskSet {
                 firstLoop = false;
             }
 
-            // Note: the bigger the smaller priority
-            lowestPriorityTask = thisTask.getPriority()>lowestPriorityTask.getPriority() ? thisTask : lowestPriorityTask;
+            // Note: the smaller the lower priority
+            lowestPriorityTask = thisTask.getPriority()<lowestPriorityTask.getPriority() ? thisTask : lowestPriorityTask;
         }
         return lowestPriorityTask;
     }
@@ -419,8 +431,8 @@ public class TaskSet {
                 firstLoop = false;
             }
 
-            // Note: the bigger the smaller priority
-            highestPriorityTask = thisTask.getPriority()<highestPriorityTask.getPriority() ? thisTask : highestPriorityTask;
+            // Note: the bigger the higher priority
+            highestPriorityTask = thisTask.getPriority()>highestPriorityTask.getPriority() ? thisTask : highestPriorityTask;
         }
         return highestPriorityTask;
     }
@@ -437,8 +449,9 @@ public class TaskSet {
     @Override
     public String toString() {
         String outStr = "TaskSet(" + getUtilization() + "):\r\n";
-        for (Task thisTask : tasks.values()) {
-            outStr += "\t" + thisTask.toString() + "\r\n";
+        for (int i=getLowestPriorityTask().getPriority(); i<=getHighestPriorityTask().getPriority(); i++) {
+        //for (Task thisTask : tasks.values()) {
+            outStr += "\t" + getOneTaskByPriority(i).toString() + "\r\n";
         }
         return outStr;
     }

@@ -130,15 +130,15 @@ abstract class SchedulerSimulator {
 
     long getDeviatedExecutionTime(Task task_i) {
         // Case of Fixed
-        // return task_i.execTime;
+        return task_i.getExecTime();
+
         // Case of Gaussian
-        //double stddev = 0.2;
-        double stddev = 0.2;    // added by CY
-        double gaussianFactor = random.nextGaussian();
-        long deviatedExecutionTime = (long) (gaussianFactor * (task_i.getExecTime() * stddev) + task_i.getExecTime());
-        //long deviatedExecutionTime = (long) ((gaussianFactor * stddev) + task_i.getComputationTimeNs());
-        return deviatedExecutionTime;//(long) (random.nextGaussian() * (task_i.getComputationTimeNs() * stddev) + task_i.getComputationTimeNs());
-        //return (long) ((random.nextGaussian() * stddev) + task_i.getComputationTimeNs());
+//        double stddev = 0.2;    // added by CY
+//        double gaussianFactor = random.nextGaussian();
+//        long deviatedExecutionTime = (long) (gaussianFactor * (task_i.getExecTime() * stddev) + task_i.getExecTime());
+//        //long deviatedExecutionTime = (long) ((gaussianFactor * stddev) + task_i.getComputationTimeNs());
+//        return deviatedExecutionTime;//(long) (random.nextGaussian() * (task_i.getComputationTimeNs() * stddev) + task_i.getComputationTimeNs());
+//        //return (long) ((random.nextGaussian() * stddev) + task_i.getComputationTimeNs());
     }
 
 

@@ -31,8 +31,14 @@ public class DistributionMap {
     @Override
     public String toString() {
         String outputStr = "";
-        for (Long index : map.keySet()) {
-            outputStr += index + " \t " + map.get(index) + "\r\n";
+        long begin = getBegin();
+        long end = getEnd();
+        for (long i=begin; i<=end; i++) {
+        //for (Long index : map.keySet()) {
+            //outputStr += index + " \t " + map.get(index) + "\r\n";
+            if (map.get(i) != null) {
+                outputStr += i + " \t " + map.get(i) + "\r\n";
+            }
         }
         return outputStr;
     }
@@ -75,8 +81,28 @@ public class DistributionMap {
         return endIndex;
     }
 
+    public long getValue(long keyNum) {
+        if (map.containsKey(keyNum)) {
+            return map.get(keyNum);
+        } else {
+            return 0;
+        }
+    }
+
+    public long getMostWeightedValue() {
+        if (map.size() == 0) {
+            return 0;
+        }
+        return Collections.max(map.values());
+    }
+
     public ArrayList<Interval> getMostWeightedIntervals() {
         ArrayList<Interval> resultIntervals = new ArrayList<>();
+
+        // Return the empty array if nothing is in the map.
+        if (map.size() == 0) {
+            return resultIntervals;
+        }
 
         long highestWeight = Collections.max(map.values());;
         Boolean isBuildingAInterval = false;

@@ -7,11 +7,23 @@
         <File name="MainLogFile" fileName="main.log" immediateFlush="false" append="false">
             <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
+        <File name="ExpLogFile1" fileName="exp1.log" immediateFlush="false" append="false">
+            <PatternLayout pattern="%msg"/>
+        </File>
+        <File name="ExpLogFile2" fileName="exp2.log" immediateFlush="false" append="false">
+            <PatternLayout pattern="%msg"/>
+        </File>
     </Appenders>
     <Loggers>
         <Root level="debug">
             <AppenderRef ref="Console" />
             <AppenderRef ref="MainLogFile"/>
         </Root>
+        <Logger name="exp1" level="trace">
+            <AppenderRef ref="ExpLogFile1"/>
+        </Logger>
+        <Logger name="exp2" level="trace">
+            <AppenderRef ref="ExpLogFile2"/>
+        </Logger>
     </Loggers>
 </Configuration>

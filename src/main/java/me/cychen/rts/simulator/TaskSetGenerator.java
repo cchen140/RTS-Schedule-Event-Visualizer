@@ -42,6 +42,12 @@ public class TaskSetGenerator {
 
     static Boolean nonHarmonicOnly;
 
+    static Boolean needGenObserverTask;
+    static Boolean needGenBadObserverTask;
+
+    static int observerTaskPriority;
+    static int victimTaskPriority;
+
     static Random rand = new Random();
 
     public TaskSetGenerator() {
@@ -68,6 +74,11 @@ public class TaskSetGenerator {
 
         nonHarmonicOnly = false;
 
+        needGenObserverTask = false;
+        needGenBadObserverTask = false;
+
+        observerTaskPriority = 1;
+        victimTaskPriority = 2;
     }
 
     public TaskSetContainer generate() {
@@ -118,6 +129,7 @@ public class TaskSetGenerator {
 //
 //    }
 
+    /* The configurations are passed by global variables. */
     private TaskSet gen()
     {
 
@@ -250,6 +262,23 @@ public class TaskSetGenerator {
             return null;
 
 
+        if (needGenObserverTask == true) {
+            Task victim, observer;
+            victim = taskContainer.getOneTaskByPriority(victimTaskPriority);
+            observer = taskContainer.getOneTaskByPriority(observerTaskPriority);
+            long gcd = Umath.gcd(victim.getPeriod(), observer.getPeriod());
+            if (observer.getExecTime() < gcd) {
+                return null;
+            }
+        } else if (needGenBadObserverTask == true) {
+            Task victim, observer;
+            victim = taskContainer.getOneTaskByPriority(victimTaskPriority);
+            observer = taskContainer.getOneTaskByPriority(observerTaskPriority);
+            long gcd = Umath.gcd(victim.getPeriod(), observer.getPeriod());
+            if (observer.getExecTime() > gcd) {
+                return null;
+            }
+        }
 
 //        int[][] sl = new int[numTasks][numTasks];
 //        for (int i=0; i<numTasks; i++)
@@ -579,6 +608,34 @@ public class TaskSetGenerator {
 
     public static Boolean getGenerateFromHpDivisors() {
         return generateFromHpDivisors;
+    }
+
+    public static Boolean getNeedGenObserverTask() {
+        return needGenObserverTask;
+    }
+
+    public static void setNeedGenObserverTask(Boolean needGenObserverTask) {
+        TaskSetGenerator.needGenObserverTask = needGenObserverTask;
+    }
+
+    public static void setNeedGenBadObserverTask(Boolean needGenBadObserverTask) {
+        TaskSetGenerator.needGenBadObserverTask = needGenBadObserverTask;
+    }
+
+    public static int getObserverTaskPriority() {
+        return observerTaskPriority;
+    }
+
+    public static void setObserverTaskPriority(int observerTaskPriority) {
+        TaskSetGenerator.observerTaskPriority = observerTaskPriority;
+    }
+
+    public static int getVictimTaskPriority() {
+        return victimTaskPriority;
+    }
+
+    public static void setVictimTaskPriority(int victimTaskPriority) {
+        TaskSetGenerator.victimTaskPriority = victimTaskPriority;
     }
 
     public static void setGenerateFromHpDivisors(Boolean generateFromHpDivisors) {
