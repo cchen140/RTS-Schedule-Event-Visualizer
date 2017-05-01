@@ -9,6 +9,7 @@ import me.cychen.rts.simulator.QuickFPSchedulerJobContainer;
 import me.cychen.rts.simulator.QuickFixedPrioritySchedulerSimulator;
 import me.cychen.rts.simulator.TaskSetContainer;
 import me.cychen.rts.simulator.TaskSetGenerator;
+import me.cychen.util.Umath;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -53,9 +54,12 @@ for (double u = 0.0; u<=0.91; u+=0.1) {
 
         /* Optimal attack condition experiment. */
     taskSetGenerator.setNeedGenObserverTask(true);
+    taskSetGenerator.setMaxObservationRatio(0.1);
+    taskSetGenerator.setMinObservationRatio(0);
+
     //taskSetGenerator.setNeedGenBadObserverTask(true);
-    taskSetGenerator.setObserverTaskPriority(VICTIM_PRI);
-    taskSetGenerator.setVictimTaskPriority(OBSERVER_PRI);
+    taskSetGenerator.setObserverTaskPriority(OBSERVER_PRI);
+    taskSetGenerator.setVictimTaskPriority(VICTIM_PRI);
 
     TaskSetContainer taskSets = taskSetGenerator.generate(NUM_OF_TASKS, NUM_OF_TASK_SETS);
 
@@ -134,8 +138,12 @@ for (double u = 0.0; u<=0.91; u+=0.1) {
             continue;
         }
 
+        double gcd = Umath.gcd(victimTask.getPeriod(), observerTask.getPeriod());
+        double observationRatio = observerTask.getExecTime()/gcd;
+
         loggerExp_by_taskset.trace("\n" + thisTaskSet.getUtilization() + "\t" + scheduLeakSporadic.foundPeriodFactor + "\t" + victimTask.getPeriod() + "\t" + scheduLeakSporadic.foundPeriodFactor*victimTask.getPeriod() + "\t" + observationUpperBound_1 + "\t" + (scheduLeakSporadic.foundPeriodFactor*victimTask.getPeriod()) / (double) observationUpperBound_1);
         loggerExp_by_taskset.trace("\t" + scheduLeakSporadic.arrivalColumnCount);
+        loggerExp_by_taskset.trace("\t" + observationRatio);
 
         processedVictimPeriods += scheduLeakSporadic.foundPeriodFactor;
         taskSetCount++;

@@ -44,10 +44,12 @@ public class MainSingleTaskSetTest {
         //taskSetGenerator.setGenerateFromHpDivisors(true);
 
         /* Optimal attack condition experiment. */
-//        taskSetGenerator.setNeedGenObserverTask(true);
-        taskSetGenerator.setNeedGenBadObserverTask(true);
+       taskSetGenerator.setNeedGenObserverTask(true);
         taskSetGenerator.setObserverTaskPriority(5);
         taskSetGenerator.setVictimTaskPriority(10);
+
+        taskSetGenerator.setMaxObservationRatio(999);
+        taskSetGenerator.setMinObservationRatio(1);
 
         TaskSetContainer taskSets = taskSetGenerator.generate(15, 1);
 

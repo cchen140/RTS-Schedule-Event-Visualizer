@@ -43,10 +43,15 @@ public class TaskSetGenerator {
     static Boolean nonHarmonicOnly;
 
     static Boolean needGenObserverTask;
-    static Boolean needGenBadObserverTask;
+    static double maxObservationRatio;
+    static double minObservationRatio;
+
+    //static Boolean needGenBadObserverTask;
 
     static int observerTaskPriority;
     static int victimTaskPriority;
+
+
 
     static Random rand = new Random();
 
@@ -75,7 +80,8 @@ public class TaskSetGenerator {
         nonHarmonicOnly = false;
 
         needGenObserverTask = false;
-        needGenBadObserverTask = false;
+        maxObservationRatio = 999;
+        minObservationRatio = 1.0;
 
         observerTaskPriority = 1;
         victimTaskPriority = 2;
@@ -267,20 +273,14 @@ public class TaskSetGenerator {
             return null;
 
 
+        double observationRatio = 0;
         if (needGenObserverTask == true) {
             Task victim, observer;
             victim = taskContainer.getOneTaskByPriority(victimTaskPriority);
             observer = taskContainer.getOneTaskByPriority(observerTaskPriority);
-            long gcd = Umath.gcd(victim.getPeriod(), observer.getPeriod());
-            if (observer.getExecTime() < gcd) {
-                return null;
-            }
-        } else if (needGenBadObserverTask == true) {
-            Task victim, observer;
-            victim = taskContainer.getOneTaskByPriority(victimTaskPriority);
-            observer = taskContainer.getOneTaskByPriority(observerTaskPriority);
-            long gcd = Umath.gcd(victim.getPeriod(), observer.getPeriod());
-            if (observer.getExecTime() > gcd) {
+            double gcd = Umath.gcd(victim.getPeriod(), observer.getPeriod());
+            observationRatio = observer.getExecTime()/gcd;
+            if ((observationRatio<minObservationRatio) || (observationRatio>maxObservationRatio)) {
                 return null;
             }
         }
@@ -623,8 +623,12 @@ public class TaskSetGenerator {
         TaskSetGenerator.needGenObserverTask = needGenObserverTask;
     }
 
-    public static void setNeedGenBadObserverTask(Boolean needGenBadObserverTask) {
-        TaskSetGenerator.needGenBadObserverTask = needGenBadObserverTask;
+    public static void setMaxObservationRatio(double maxObservationRatio) {
+        TaskSetGenerator.maxObservationRatio = maxObservationRatio;
+    }
+
+    public static void setMinObservationRatio(double minObservationRatio) {
+        TaskSetGenerator.minObservationRatio = minObservationRatio;
     }
 
     public static int getObserverTaskPriority() {
