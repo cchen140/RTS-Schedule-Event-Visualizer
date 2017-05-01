@@ -18,20 +18,21 @@ import org.apache.logging.log4j.Logger;
 public class Main {
     static long SIM_DURATION = 10000;
 
-    private static final int VICTIM_PRI = 3;
+    private static final int VICTIM_PRI = 2;
     private static final int OBSERVER_PRI = 1;
-    private static final int NUM_OF_TASKS = 15;
-    private static final int NUM_OF_TASK_SETS = 100;
+    private static final int NUM_OF_TASKS = 5;
+    private static final int NUM_OF_TASK_SETS = 10;
 
-        private static final Logger logger = LogManager.getLogger("Main");
-    private static final Logger loggerExp2 = LogManager.getLogger("exp2");
+    private static final Logger logger = LogManager.getLogger("Main");
+    private static final Logger loggerExp_by_taskset = LogManager.getLogger("exp_by_taskset");
+    private static final Logger loggerExp_by_util = LogManager.getLogger("exp_by_util");
 
 
     public static void main(String[] args) {
         int errorCount = 0;
 
         logger.info("Test starts.");
-        loggerExp2.trace("\n");
+        loggerExp_by_taskset.trace("\n");
 
         // Generate a task set.
         TaskSetGenerator taskSetGenerator = new TaskSetGenerator();
@@ -62,6 +63,8 @@ for (double u = 0.0; u<=0.91; u+=0.1) {
 
     long successfulInferenceCount = 0;
     long successfulVictimHighestPriorityCount = 0;
+    long processedVictimPeriods = 0;
+    int taskSetCount = 0;
     for (TaskSet thisTaskSet : taskSets.getTaskSets()) {
         //logger.info(thisTaskSet.toString());
 
@@ -127,9 +130,18 @@ for (double u = 0.0; u<=0.91; u+=0.1) {
         //arrivalWindow = scheduLeakSporadic.getTaskArrivalWindow();
         //logger.info(arrivalWindow.toString());
 
-        loggerExp2.trace("\n" + thisTaskSet.getUtilization() + "\t" + scheduLeakSporadic.foundPeriodFactor + "\t" + victimTask.getPeriod() + "\t" + observationUpperBound_1 + "\t" + (scheduLeakSporadic.foundPeriodFactor*victimTask.getPeriod()) / (double) observationUpperBound_1);
+        if (scheduLeakSporadic.foundPeriodFactor == 0) {
+            continue;
+        }
 
+        loggerExp_by_taskset.trace("\n" + thisTaskSet.getUtilization() + "\t" + scheduLeakSporadic.foundPeriodFactor + "\t" + victimTask.getPeriod() + "\t" + scheduLeakSporadic.foundPeriodFactor*victimTask.getPeriod() + "\t" + observationUpperBound_1 + "\t" + (scheduLeakSporadic.foundPeriodFactor*victimTask.getPeriod()) / (double) observationUpperBound_1);
+        loggerExp_by_taskset.trace("\t" + scheduLeakSporadic.arrivalColumnCount);
+
+        processedVictimPeriods += scheduLeakSporadic.foundPeriodFactor;
+        taskSetCount++;
     }
+
+    loggerExp_by_util.trace("\n" + u + "\t" + processedVictimPeriods/(double)taskSetCount);
 }
 //        logger.info("Successful Inference: " + successfulInferenceCount);
 //        logger.info(" - Highest Priority Victim: " + successfulVictimHighestPriorityCount);

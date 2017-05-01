@@ -26,6 +26,7 @@ public class ScheduLeakSporadic {
     long processedPeriodCount = 0;
     public Boolean hasFoundArrival = false;
     public long foundPeriodFactor = 0;
+    public long arrivalColumnCount = 0;
 
     public TaskArrivalWindow getTaskArrivalWindow() {
         return taskArrivalWindow;
@@ -73,6 +74,7 @@ public class ScheduLeakSporadic {
 
                     if (hasFoundArrival == false) {
                         foundPeriodFactor = periodFactor;
+                        arrivalColumnCount = executionMap.getMostWeightedValue();
                         hasFoundArrival = true;
                     }
                 } else {

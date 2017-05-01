@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
+<Configuration status="error">
     <!--<ThresholdFilter level="INFO"/>-->
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
@@ -11,7 +11,10 @@
         <File name="ExpLogFile1" fileName="exp1.log" immediateFlush="true" append="false">
             <PatternLayout pattern="%msg"/>
         </File>
-        <File name="ExpLogFile2" fileName="exp2.log" immediateFlush="true" append="false">
+        <File name="ExpLogFile_by_taskset" fileName="exp_by_taskset.log" immediateFlush="true" append="false">
+            <PatternLayout pattern="%msg"/>
+        </File>
+        <File name="ExpLogFile_by_util" fileName="exp_by_util.log" immediateFlush="true" append="false">
             <PatternLayout pattern="%msg"/>
         </File>
     </Appenders>
@@ -23,8 +26,11 @@
         <Logger name="exp1" level="TRACE">
             <AppenderRef ref="ExpLogFile1"/>
         </Logger>
-        <Logger name="exp2" level="TRACE">
-            <AppenderRef ref="ExpLogFile2"/>
+        <Logger name="exp_by_taskset" level="TRACE">
+            <AppenderRef ref="ExpLogFile_by_taskset"/>
+        </Logger>
+        <Logger name="exp_by_util" level="TRACE">
+            <AppenderRef ref="ExpLogFile_by_util"/>
         </Logger>
     </Loggers>
 </Configuration>
