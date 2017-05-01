@@ -27,7 +27,7 @@ public class Main {
     private static final Logger logger = LogManager.getLogger("Main");
     private static final Logger loggerExp_by_taskset = LogManager.getLogger("exp_by_taskset");
     private static final Logger loggerExp_by_util = LogManager.getLogger("exp_by_util");
-    private static final Logger loggerExp_by_exp_by_numOfTasksPerTaskset = LogManager.getLogger("exp_by_exp_by_numOfTasksPerTaskset");
+    private static final Logger loggerExp_by_exp_by_numOfTasksPerTaskset = LogManager.getLogger("exp_by_numOfTasksPerTaskset");
 
 
     public static void main(String[] args) {
