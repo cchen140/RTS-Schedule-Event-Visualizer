@@ -32,6 +32,7 @@ public class Main {
     public static void main(String[] args) {
         int errorCount = 0;
 
+
         logger.info("Test starts.");
         loggerExp_by_taskset.trace("\n");
 
@@ -54,8 +55,8 @@ for (double u = 0.0; u<=0.91; u+=0.1) {
 
         /* Optimal attack condition experiment. */
     taskSetGenerator.setNeedGenObserverTask(true);
-    taskSetGenerator.setMaxObservationRatio(0.1);
-    taskSetGenerator.setMinObservationRatio(0);
+    taskSetGenerator.setMaxObservationRatio(999);
+    taskSetGenerator.setMinObservationRatio(1);
 
     //taskSetGenerator.setNeedGenBadObserverTask(true);
     taskSetGenerator.setObserverTaskPriority(OBSERVER_PRI);
@@ -68,9 +69,11 @@ for (double u = 0.0; u<=0.91; u+=0.1) {
     long successfulInferenceCount = 0;
     long successfulVictimHighestPriorityCount = 0;
     long processedVictimPeriods = 0;
-    int taskSetCount = 0;
-    for (TaskSet thisTaskSet : taskSets.getTaskSets()) {
+    int taskSetCount = NUM_OF_TASK_SETS;
+    int failureCount = 0;
+    while(taskSetCount>0) {
         //logger.info(thisTaskSet.toString());
+        TaskSet thisTaskSet = taskSetGenerator.generate(NUM_OF_TASKS, 1).getTaskSets().get(0);
 
         // victim and observer task
         Task victimTask = thisTaskSet.getOneTaskByPriority(VICTIM_PRI);
@@ -134,7 +137,12 @@ for (double u = 0.0; u<=0.91; u+=0.1) {
         //arrivalWindow = scheduLeakSporadic.getTaskArrivalWindow();
         //logger.info(arrivalWindow.toString());
 
-        if (scheduLeakSporadic.foundPeriodFactor == 0) {
+//        if (scheduLeakSporadic.foundPeriodFactor == 0) {
+//            continue;
+//        }
+        if (scheduLeakSporadic.hasFoundArrival == false) {
+            failureCount++;
+            taskSetCount--;
             continue;
         }
 
@@ -146,10 +154,11 @@ for (double u = 0.0; u<=0.91; u+=0.1) {
         loggerExp_by_taskset.trace("\t" + observationRatio);
 
         processedVictimPeriods += scheduLeakSporadic.foundPeriodFactor;
-        taskSetCount++;
+        taskSetCount--;
     }
 
-    loggerExp_by_util.trace("\n" + u + "\t" + processedVictimPeriods/(double)taskSetCount);
+    loggerExp_by_util.trace("\n" + u + "\t" + ((double)processedVictimPeriods/(NUM_OF_TASK_SETS-failureCount)));
+    loggerExp_by_util.trace("\t" + ((double)failureCount/NUM_OF_TASK_SETS));
 }
 //        logger.info("Successful Inference: " + successfulInferenceCount);
 //        logger.info(" - Highest Priority Victim: " + successfulVictimHighestPriorityCount);
