@@ -17,6 +17,9 @@
         <File name="ExpLogFile_by_util" fileName="exp_by_util.log" immediateFlush="true" append="false">
             <PatternLayout pattern="%msg"/>
         </File>
+        <File name="ExpLogFile_by_numOfTasksPerTaskset" fileName="exp_by_numOfTasksPerTaskset.log" immediateFlush="true" append="false">
+            <PatternLayout pattern="%msg"/>
+        </File>
     </Appenders>
     <Loggers>
         <Root level="error">
@@ -31,6 +34,9 @@
         </Logger>
         <Logger name="exp_by_util" level="TRACE">
             <AppenderRef ref="ExpLogFile_by_util"/>
+        </Logger>
+        <Logger name="exp_by_numOfTasksPerTaskset" level="TRACE">
+            <AppenderRef ref="ExpLogFile_by_numOfTasksPerTaskset"/>
         </Logger>
     </Loggers>
 </Configuration>
