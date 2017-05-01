@@ -21,12 +21,13 @@ public class Main {
 
     private static final int VICTIM_PRI = 2;
     private static final int OBSERVER_PRI = 1;
-    private static final int NUM_OF_TASKS = 5;
+    //private static final int NUM_OF_TASKS = 15;
     private static final int NUM_OF_TASK_SETS = 10;
 
     private static final Logger logger = LogManager.getLogger("Main");
     private static final Logger loggerExp_by_taskset = LogManager.getLogger("exp_by_taskset");
     private static final Logger loggerExp_by_util = LogManager.getLogger("exp_by_util");
+    private static final Logger loggerExp_by_exp_by_numOfTasksPerTaskset = LogManager.getLogger("exp_by_exp_by_numOfTasksPerTaskset");
 
 
     public static void main(String[] args) {
@@ -44,83 +45,88 @@ public class Main {
 
         //taskSetGenerator.setMaxExecTime(20);
         //taskSetGenerator.setMinExecTime(5);
-for (double u = 0.0; u<=0.91; u+=0.1) {
-    taskSetGenerator.setMaxUtil(u + 0.09);
-    taskSetGenerator.setMinUtil(u);
+        for (int numOfTasks = 5; numOfTasks<=15; numOfTasks+=2) {
+            double processedLcmPvPo_numOfTasksPerTaskset = 0;
 
-    taskSetGenerator.setNonHarmonicOnly(true);
+            loggerExp_by_util.trace("\n numOfTasks: " + numOfTasks);
 
-    //taskSetGenerator.setMaxHyperPeriod(70070);
-    //taskSetGenerator.setGenerateFromHpDivisors(true);
+            for (double u = 0.0; u <= 0.91; u += 0.1) {
+                taskSetGenerator.setMaxUtil(u + 0.09);
+                taskSetGenerator.setMinUtil(u);
+
+                taskSetGenerator.setNonHarmonicOnly(true);
+
+                //taskSetGenerator.setMaxHyperPeriod(70070);
+                //taskSetGenerator.setGenerateFromHpDivisors(true);
 
         /* Optimal attack condition experiment. */
-    taskSetGenerator.setNeedGenObserverTask(true);
-    taskSetGenerator.setMaxObservationRatio(999);
-    taskSetGenerator.setMinObservationRatio(1);
+                taskSetGenerator.setNeedGenObserverTask(true);
+                taskSetGenerator.setMaxObservationRatio(999);
+                taskSetGenerator.setMinObservationRatio(1);
 
-    //taskSetGenerator.setNeedGenBadObserverTask(true);
-    taskSetGenerator.setObserverTaskPriority(OBSERVER_PRI);
-    taskSetGenerator.setVictimTaskPriority(VICTIM_PRI);
+                //taskSetGenerator.setNeedGenBadObserverTask(true);
+                taskSetGenerator.setObserverTaskPriority(OBSERVER_PRI);
+                taskSetGenerator.setVictimTaskPriority(VICTIM_PRI);
 
-    TaskSetContainer taskSets = taskSetGenerator.generate(NUM_OF_TASKS, NUM_OF_TASK_SETS);
+                //TaskSetContainer taskSets = taskSetGenerator.generate(NUM_OF_TASKS, NUM_OF_TASK_SETS);
 
-    DistributionMap matchedPeriodDistribution = new DistributionMap();
+                //DistributionMap matchedPeriodDistribution = new DistributionMap();
 
-    long successfulInferenceCount = 0;
-    long successfulVictimHighestPriorityCount = 0;
-    long processedVictimPeriods = 0;
-    int taskSetCount = NUM_OF_TASK_SETS;
-    int failureCount = 0;
-    while(taskSetCount>0) {
-        //logger.info(thisTaskSet.toString());
-        TaskSet thisTaskSet = taskSetGenerator.generate(NUM_OF_TASKS, 1).getTaskSets().get(0);
+                long successfulInferenceCount = 0;
+                long successfulVictimHighestPriorityCount = 0;
+                double processedLcmPvPo = 0;
+                int taskSetCount = NUM_OF_TASK_SETS;
+                int failureCount = 0;
+                while (taskSetCount > 0) {
+                    //logger.info(thisTaskSet.toString());
+                    TaskSet thisTaskSet = taskSetGenerator.generate(numOfTasks, 1).getTaskSets().get(0);
 
-        // victim and observer task
-        Task victimTask = thisTaskSet.getOneTaskByPriority(VICTIM_PRI);
-        Task observerTask = thisTaskSet.getOneTaskByPriority(OBSERVER_PRI);
+                    // victim and observer task
+                    Task victimTask = thisTaskSet.getOneTaskByPriority(VICTIM_PRI);
+                    Task observerTask = thisTaskSet.getOneTaskByPriority(OBSERVER_PRI);
 
-        // Upper bound
-        long observationUpperBound_1 = ScheduLeakSporadic.computeObservationUpperBound_1(thisTaskSet, observerTask, victimTask);
-        //long observationUpperBound_2 = ScheduLeakSporadic.computeObservationUpperBound_2(thisTaskSet, observerTask, victimTask);
-        //logger.info("Observation Upper bound1: " + observationUpperBound_1 + "/" + victimTask.getPeriod() + " = " + observationUpperBound_1/victimTask.getPeriod());
-        //logger.info("Observation Upper bound2: " + observationUpperBound_2 + "/" + victimTask.getPeriod() + " = " + observationUpperBound_2/victimTask.getPeriod());
+                    // Upper bound
+                    long observationUpperBound_1 = ScheduLeakSporadic.computeObservationUpperBound_1(thisTaskSet, observerTask, victimTask);
+                    //long observationUpperBound_2 = ScheduLeakSporadic.computeObservationUpperBound_2(thisTaskSet, observerTask, victimTask);
+                    //logger.info("Observation Upper bound1: " + observationUpperBound_1 + "/" + victimTask.getPeriod() + " = " + observationUpperBound_1/victimTask.getPeriod());
+                    //logger.info("Observation Upper bound2: " + observationUpperBound_2 + "/" + victimTask.getPeriod() + " = " + observationUpperBound_2/victimTask.getPeriod());
 
-        if (observationUpperBound_1 > 1000000) {
-            continue;
-        } else if (observationUpperBound_1 <= 0) {
-            errorCount++;
-            //logger.error("Negative upper bound!");
-            continue;
-        }
+                    if (observationUpperBound_1 > 1000000) {
+                        continue;
+                    } else if (observationUpperBound_1 <= 0) {
+                        errorCount++;
+                        //logger.error("Negative upper bound!");
+                        continue;
+                    }
 
-        // New and configure a RM scheduling simulator.
-        QuickFixedPrioritySchedulerSimulator rmSimulator = new QuickFixedPrioritySchedulerSimulator();
-        rmSimulator.setTaskSet(thisTaskSet);
+                    // New and configure a RM scheduling simulator.
+                    QuickFixedPrioritySchedulerSimulator rmSimulator = new QuickFixedPrioritySchedulerSimulator();
+                    rmSimulator.setTaskSet(thisTaskSet);
 
-        // Pre-schedule
-        QuickFPSchedulerJobContainer simJobContainer = rmSimulator.preSchedule(observationUpperBound_1);
+                    // Pre-schedule
+                    QuickFPSchedulerJobContainer simJobContainer = rmSimulator.preSchedule(observationUpperBound_1);
 
-        // New Sporadic ScheduLeak
-        ScheduLeakSporadic scheduLeakSporadic = new ScheduLeakSporadic();
-        //long victimTaskSmallestExecutionTime = scheduLeakSporadic.findTaskSmallestJobExecutionTime(simJobContainer, victimTask);
-        //logger.info("Victim task's smallest C = " + victimTaskSmallestExecutionTime);
+                    // New Sporadic ScheduLeak
+                    ScheduLeakSporadic scheduLeakSporadic = new ScheduLeakSporadic();
+                    //long victimTaskSmallestExecutionTime = scheduLeakSporadic.findTaskSmallestJobExecutionTime(simJobContainer, victimTask);
+                    //logger.info("Victim task's smallest C = " + victimTaskSmallestExecutionTime);
 
-        // Run simulation.
-        rmSimulator.simJobs(simJobContainer);
-        EventContainer eventContainer = rmSimulator.getSimEventContainer();
+                    // Run simulation.
+                    rmSimulator.simJobs(simJobContainer);
+                    EventContainer eventContainer = rmSimulator.getSimEventContainer();
 
-        // Build busy intervals for ScheduLeak
-        BusyIntervalEventContainer biEvents = new BusyIntervalEventContainer();
-        biEvents.createBusyIntervalsFromEvents(eventContainer);
-        biEvents.removeBusyIntervalsBeforeButExcludeTimeStamp(victimTask.getInitialOffset());
-        //biEvents.removeTheLastBusyInterval();
+                    // Build busy intervals for ScheduLeak
+                    BusyIntervalEventContainer biEvents = new BusyIntervalEventContainer();
+                    biEvents.createBusyIntervalsFromEvents(eventContainer);
+                    biEvents.removeBusyIntervalsBeforeButExcludeTimeStamp(victimTask.getInitialOffset());
+                    //biEvents.removeTheLastBusyInterval();
 
-        // Get only observable busy intervals
-        BusyIntervalEventContainer observedBiEvents =
-                new BusyIntervalEventContainer(biEvents.getObservableBusyIntervalsByTask(observerTask));
+                    // Get only observable busy intervals
+                    BusyIntervalEventContainer observedBiEvents =
+                            new BusyIntervalEventContainer(biEvents.getObservableBusyIntervalsByTask(observerTask));
 
             /* distribution map */
-        DistributionMap taskExecutionDistribution = scheduLeakSporadic.computeExecutionDistributionByTaskPeriod(observedBiEvents, victimTask);
+                    DistributionMap taskExecutionDistribution = scheduLeakSporadic.computeExecutionDistributionByTaskPeriod(observedBiEvents, victimTask);
 
             /* Run ScheduLeak */
 //            TaskArrivalWindow arrivalWindow;
@@ -134,32 +140,42 @@ for (double u = 0.0; u<=0.91; u+=0.1) {
 //                    successfulVictimHighestPriorityCount++;
 //                }
 //            }
-        //arrivalWindow = scheduLeakSporadic.getTaskArrivalWindow();
-        //logger.info(arrivalWindow.toString());
+                    //arrivalWindow = scheduLeakSporadic.getTaskArrivalWindow();
+                    //logger.info(arrivalWindow.toString());
 
 //        if (scheduLeakSporadic.foundPeriodFactor == 0) {
 //            continue;
 //        }
-        if (scheduLeakSporadic.hasFoundArrival == false) {
-            failureCount++;
-            taskSetCount--;
-            continue;
+                    if (scheduLeakSporadic.hasFoundArrival == false) {
+                        failureCount++;
+                        taskSetCount--;
+                        continue;
+                    }
+
+                    double gcd = Umath.gcd(victimTask.getPeriod(), observerTask.getPeriod());
+                    double lcm = Umath.lcm(victimTask.getPeriod(), observerTask.getPeriod());
+                    double observationRatio = observerTask.getExecTime() / gcd;
+
+                    //loggerExp_by_taskset.trace("\n" + thisTaskSet.getUtilization() + "\t" + scheduLeakSporadic.foundPeriodFactor + "\t" + victimTask.getPeriod() + "\t" + scheduLeakSporadic.foundPeriodFactor*victimTask.getPeriod() + "\t" + observationUpperBound_1 + "\t" + (scheduLeakSporadic.foundPeriodFactor*victimTask.getPeriod()) / (double) observationUpperBound_1);
+                    loggerExp_by_taskset.trace("\n" + thisTaskSet.getUtilization() + "\t" + scheduLeakSporadic.foundPeriodFactor + "\t" + victimTask.getPeriod() + "\t" + observerTask.getPeriod() + "\t" + scheduLeakSporadic.foundPeriodFactor / (double) observerTask.getPeriod() + "\t" + observationUpperBound_1 + "\t" + observationUpperBound_1 / lcm + "\t" + (scheduLeakSporadic.foundPeriodFactor * victimTask.getPeriod()) / (double) observationUpperBound_1);
+                    loggerExp_by_taskset.trace("\t" + scheduLeakSporadic.arrivalColumnCount);
+                    loggerExp_by_taskset.trace("\t" + observationRatio);
+
+                    processedLcmPvPo += ((scheduLeakSporadic.foundPeriodFactor * victimTask.getPeriod()) / (double) lcm);
+                    taskSetCount--;
+                }
+
+                processedLcmPvPo = processedLcmPvPo/(NUM_OF_TASK_SETS - failureCount);
+                processedLcmPvPo_numOfTasksPerTaskset += processedLcmPvPo;
+
+                loggerExp_by_util.trace("\n" + u + "\t" + processedLcmPvPo);
+                loggerExp_by_util.trace("\t" + ((double) failureCount / NUM_OF_TASK_SETS));
+            }
+
+            processedLcmPvPo_numOfTasksPerTaskset = processedLcmPvPo_numOfTasksPerTaskset/10.0; // 10 utilization groups.
+
+            loggerExp_by_exp_by_numOfTasksPerTaskset.trace("\n" + numOfTasks + "\t" + processedLcmPvPo_numOfTasksPerTaskset);
         }
-
-        double gcd = Umath.gcd(victimTask.getPeriod(), observerTask.getPeriod());
-        double observationRatio = observerTask.getExecTime()/gcd;
-
-        loggerExp_by_taskset.trace("\n" + thisTaskSet.getUtilization() + "\t" + scheduLeakSporadic.foundPeriodFactor + "\t" + victimTask.getPeriod() + "\t" + scheduLeakSporadic.foundPeriodFactor*victimTask.getPeriod() + "\t" + observationUpperBound_1 + "\t" + (scheduLeakSporadic.foundPeriodFactor*victimTask.getPeriod()) / (double) observationUpperBound_1);
-        loggerExp_by_taskset.trace("\t" + scheduLeakSporadic.arrivalColumnCount);
-        loggerExp_by_taskset.trace("\t" + observationRatio);
-
-        processedVictimPeriods += scheduLeakSporadic.foundPeriodFactor;
-        taskSetCount--;
-    }
-
-    loggerExp_by_util.trace("\n" + u + "\t" + ((double)processedVictimPeriods/(NUM_OF_TASK_SETS-failureCount)));
-    loggerExp_by_util.trace("\t" + ((double)failureCount/NUM_OF_TASK_SETS));
-}
 //        logger.info("Successful Inference: " + successfulInferenceCount);
 //        logger.info(" - Highest Priority Victim: " + successfulVictimHighestPriorityCount);
 //        logger.info("Distribution: \r\n" + matchedPeriodDistribution.toString());
