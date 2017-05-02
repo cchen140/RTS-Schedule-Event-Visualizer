@@ -104,7 +104,7 @@ public class Main {
                     rmSimulator.setTaskSet(thisTaskSet);
 
                     // Pre-schedule
-                    QuickFPSchedulerJobContainer simJobContainer = rmSimulator.preSchedule(observationUpperBound_1);
+                    QuickFPSchedulerJobContainer simJobContainer = rmSimulator.preSchedule(observationUpperBound_1*2); //################################# warning!!!
 
                     // New Sporadic ScheduLeak
                     ScheduLeakSporadic scheduLeakSporadic = new ScheduLeakSporadic();
@@ -162,8 +162,10 @@ public class Main {
                     double lcm = Umath.lcm(victimTask.getPeriod(), observerTask.getPeriod());
                     double observationRatio = observerTask.getExecTime() / gcd;
 
+                    long foundTimeTick = scheduLeakSporadic.foundPeriodFactor*victimTask.getPeriod();
+
                     //loggerExp_by_taskset.trace("\n" + thisTaskSet.getUtilization() + "\t" + scheduLeakSporadic.foundPeriodFactor + "\t" + victimTask.getPeriod() + "\t" + scheduLeakSporadic.foundPeriodFactor*victimTask.getPeriod() + "\t" + observationUpperBound_1 + "\t" + (scheduLeakSporadic.foundPeriodFactor*victimTask.getPeriod()) / (double) observationUpperBound_1);
-                    loggerExp_by_taskset.trace("\n" + thisTaskSet.getUtilization() + "\t" + scheduLeakSporadic.foundPeriodFactor + "\t" + victimTask.getPeriod() + "\t" + observerTask.getPeriod() + "\t" + scheduLeakSporadic.foundPeriodFactor / (double) observerTask.getPeriod() + "\t" + observationUpperBound_1 + "\t" + observationUpperBound_1 / lcm + "\t" + (scheduLeakSporadic.foundPeriodFactor * victimTask.getPeriod()) / (double) observationUpperBound_1);
+                    loggerExp_by_taskset.trace("\n" + thisTaskSet.getUtilization() + "\t" + scheduLeakSporadic.foundPeriodFactor + "\t" + victimTask.getPeriod() + "\t" + observerTask.getPeriod() + "\t" + observationUpperBound_1 + "\t" + foundTimeTick/lcm + "\t" + observationUpperBound_1 / lcm + "\t" + (foundTimeTick / (double) observationUpperBound_1));
                     loggerExp_by_taskset.trace("\t" + scheduLeakSporadic.arrivalColumnCount);
                     loggerExp_by_taskset.trace("\t" + observationRatio);
 
