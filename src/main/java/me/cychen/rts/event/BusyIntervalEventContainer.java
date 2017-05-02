@@ -154,7 +154,7 @@ public class BusyIntervalEventContainer {
         return resultBis;
     }
 
-    public ArrayList<BusyIntervalEvent> getObservableBusyIntervalsByTask(Task inTask) {
+    public ArrayList<BusyIntervalEvent> getObservableBusyIntervalsByTask(Task inTask) throws Exception {
         ArrayList<BusyIntervalEvent> observedBis = new ArrayList<>();
         for (BusyIntervalEvent thisBi : busyIntervals) {
             BusyIntervalEvent observedBi = null;
@@ -162,11 +162,11 @@ public class BusyIntervalEventContainer {
             for (SchedulerIntervalEvent thisEvent : thisBi.getSchedulerIntervalEvents()) {
                 if (thisEvent.getTask() == inTask) {
 
-                    // handling the last constructing busy interval.
+                    // handling the previous constructing busy interval.
                     if (isConstructingBi == true) {
                         // It should be the end of an observable busy interval.
                         if (thisEvent.getBeginTimeScheduleState() != SchedulerIntervalEvent.SCHEDULE_STATE_RESUME)
-                            throw new AssertionError();
+                            throw new RuntimeException("Scheduling state inconsistent.");//AssertionError();
 
                         observedBis.add(observedBi);
                     }

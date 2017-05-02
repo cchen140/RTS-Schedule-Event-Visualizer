@@ -93,7 +93,12 @@ public class MainSingleTaskSetTest {
 
         // Get only observable busy intervals
         BusyIntervalEventContainer observedBiEvents =
-                new BusyIntervalEventContainer( biEvents.getObservableBusyIntervalsByTask(observerTask) );
+                null;
+        try {
+            observedBiEvents = new BusyIntervalEventContainer( biEvents.getObservableBusyIntervalsByTask(observerTask) );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
         /* Run ScheduLeak */
