@@ -169,6 +169,17 @@ public class BusyIntervalEventContainer {
                             throw new RuntimeException("Scheduling state inconsistent.");//AssertionError();
 
                         observedBis.add(observedBi);
+                    } else {
+                        if (thisEvent.getBeginTimeScheduleState() == SchedulerIntervalEvent.SCHEDULE_STATE_START) {
+                            // Check whether we are postponed before we start.
+                            long thisStartTime = thisEvent.getOrgBeginTimestamp();
+                            long startTimeOffset = (thisStartTime - inTask.getInitialOffset()) % inTask.getPeriod();
+                            if (startTimeOffset > 0) {
+                                // We are indeed postponed.
+                                // Create a busy interval with the postponed interval.
+                                observedBis.add(new BusyIntervalEvent(thisStartTime - startTimeOffset, thisStartTime));
+                            }
+                        }
                     }
 
                     // Handling the situation after this schedule interval
