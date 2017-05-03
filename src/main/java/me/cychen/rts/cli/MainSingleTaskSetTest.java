@@ -10,6 +10,7 @@ import me.cychen.rts.simulator.QuickFPSchedulerJobContainer;
 import me.cychen.rts.simulator.QuickFixedPrioritySchedulerSimulator;
 import me.cychen.rts.simulator.TaskSetContainer;
 import me.cychen.rts.simulator.TaskSetGenerator;
+import me.cychen.rts.util.ExcelLogHandler;
 import me.cychen.util.Umath;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,11 +21,14 @@ import org.apache.logging.log4j.Logger;
 public class MainSingleTaskSetTest {
     static long SIM_DURATION = 100000;
 
-    private static final Logger logger = LogManager.getLogger("MainSingleTaskSetTest");
+    private static final int VICTIM_PRI = 2;
+    private static final int OBSERVER_PRI = 1;
+
+    private static final Logger loggerConsole = LogManager.getLogger("console");
     private static final Logger loggerExp2 = LogManager.getLogger("exp2");
 
     public static void main(String[] args) {
-        logger.info("Test starts.");
+        loggerConsole.info("Test starts.");
 
         // Generate a task set.
         TaskSetGenerator taskSetGenerator = new TaskSetGenerator();
@@ -45,8 +49,8 @@ public class MainSingleTaskSetTest {
 
         /* Optimal attack condition experiment. */
        taskSetGenerator.setNeedGenObserverTask(true);
-        taskSetGenerator.setObserverTaskPriority(5);
-        taskSetGenerator.setVictimTaskPriority(10);
+        taskSetGenerator.setObserverTaskPriority(OBSERVER_PRI);
+        taskSetGenerator.setVictimTaskPriority(VICTIM_PRI);
 
         taskSetGenerator.setMaxObservationRatio(999);
         taskSetGenerator.setMinObservationRatio(1);
@@ -55,28 +59,31 @@ public class MainSingleTaskSetTest {
 
         TaskSet taskSet = taskSets.getTaskSets().get(0);
 
-        // victim
-        Task victimTask = taskSet.getOneTaskByPriority(10);
+        // victim and observer task
+        Task victimTask = taskSet.getOneTaskByPriority(VICTIM_PRI);
+        Task observerTask = taskSet.getOneTaskByPriority(OBSERVER_PRI);
 
-        // observer task
-        Task observerTask = taskSet.getOneTaskByPriority(5);
+        double gcd = Umath.gcd(victimTask.getPeriod(), observerTask.getPeriod());
+        double lcm = Umath.lcm(victimTask.getPeriod(), observerTask.getPeriod());
+        double observationRatio = observerTask.getExecTime() / gcd;
 
-        logger.info(taskSet.toString());
+
+        loggerConsole.info(taskSet.toString());
         long taskSetHyperPeriod = taskSet.calHyperPeriod();
-        logger.info("Task Hyper-period: " + taskSetHyperPeriod);
+        loggerConsole.info("Task Hyper-period: " + taskSetHyperPeriod);
 
         // Upper bound
         long observationUpperBound_1 = ScheduLeakSporadic.computeObservationUpperBound_1(taskSet, observerTask, victimTask);
         long observationUpperBound_2 = ScheduLeakSporadic.computeObservationUpperBound_2(taskSet, observerTask, victimTask);
-        logger.info("Observation Upper bound1: " + observationUpperBound_1 + "/" + victimTask.getPeriod() + " = " + observationUpperBound_1/victimTask.getPeriod());
-        logger.info("Observation Upper bound2: " + observationUpperBound_2 + "/" + victimTask.getPeriod() + " = " + observationUpperBound_2/victimTask.getPeriod());
+        loggerConsole.info("Observation Upper bound1: " + observationUpperBound_1 + "/" + victimTask.getPeriod() + " = " + observationUpperBound_1/victimTask.getPeriod());
+        loggerConsole.info("Observation Upper bound2: " + observationUpperBound_2 + "/" + victimTask.getPeriod() + " = " + observationUpperBound_2/victimTask.getPeriod());
 
         // New and configure a RM scheduling simulator.
         QuickFixedPrioritySchedulerSimulator rmSimulator = new QuickFixedPrioritySchedulerSimulator();
         rmSimulator.setTaskSet(taskSet);
 
         // Pre-schedule
-        QuickFPSchedulerJobContainer simJobContainer = rmSimulator.preSchedule(observationUpperBound_1);//SIM_DURATION);
+        QuickFPSchedulerJobContainer simJobContainer = rmSimulator.preSchedule(SIM_DURATION);
 
         // New Sporadic ScheduLeak
         ScheduLeakSporadic scheduLeakSporadic = new ScheduLeakSporadic();
@@ -105,50 +112,50 @@ public class MainSingleTaskSetTest {
         /* intersection
         TaskArrivalWindow arrivalWindow;
         if (scheduLeakSporadic.computeArrivalWindowOfTaskByIntersection(biEvents, victimTask, new Interval(victimTask.getInitialOffset(), victimTask.getInitialOffset() + victimTaskSmallestExecutionTime), SIM_DURATION)) {
-            logger.info("Arrival window matched! " + scheduLeakSporadic.getProcessedPeriodCount());
+            loggerConsole.info("Arrival window matched! " + scheduLeakSporadic.getProcessedPeriodCount());
         }
         arrivalWindow = scheduLeakSporadic.getTaskArrivalWindow();
-        logger.info(arrivalWindow.toString());
+        loggerConsole.info(arrivalWindow.toString());
         */
 
         /* distribution map */
         DistributionMap taskExecutionDistribution = scheduLeakSporadic.computeExecutionDistributionByTaskPeriod(observedBiEvents, victimTask);
-        //logger.info("\r\n" + taskExecutionDistribution.toString());
+        //loggerConsole.info("\r\n" + taskExecutionDistribution.toString());
 
-        logger.info("Victim Task: " + victimTask.toString());
-        logger.info("Observer Task: " + observerTask.toString());
-        logger.info("O(ov) = " + observerTask.getExecTime()/(double) Umath.gcd(victimTask.getPeriod(), observerTask.getPeriod()));
-        logger.info("Victim task's smallest C = " + victimTaskSmallestExecutionTime);
-        logger.info("Observation Upper bound1: " + observationUpperBound_1 + "/" + victimTask.getPeriod() + " = " + observationUpperBound_1/victimTask.getPeriod());
-        logger.info("Observation Upper bound2: " + observationUpperBound_2 + "/" + victimTask.getPeriod() + " = " + observationUpperBound_2/victimTask.getPeriod());
-        logger.info("\r\nMost Weighted Intervals: " + taskExecutionDistribution.getMostWeightedIntervals().toString());
-        logger.info("Most Weighted Value: " + taskExecutionDistribution.getMostWeightedValue());
+        loggerConsole.info("Victim Task: " + victimTask.toString());
+        loggerConsole.info("Observer Task: " + observerTask.toString());
+        loggerConsole.info("O(ov) = " + observerTask.getExecTime()/(double) Umath.gcd(victimTask.getPeriod(), observerTask.getPeriod()));
+        loggerConsole.info("Victim task's smallest C = " + victimTaskSmallestExecutionTime);
+        loggerConsole.info("Observation Upper bound1: " + observationUpperBound_1 + "/" + victimTask.getPeriod() + " = " + observationUpperBound_1/victimTask.getPeriod());
+        loggerConsole.info("Observation Upper bound2: " + observationUpperBound_2 + "/" + victimTask.getPeriod() + " = " + observationUpperBound_2/victimTask.getPeriod());
+        loggerConsole.info("\r\nMost Weighted Intervals: " + taskExecutionDistribution.getMostWeightedIntervals().toString());
+        loggerConsole.info("Most Weighted Value: " + taskExecutionDistribution.getMostWeightedValue());
 
         //ScheduLeakRestricted scheduLeakRestricted = new ScheduLeakRestricted(taskSet, new BusyIntervalContainer(biEvents));
         //EventContainer decomposedEvents = scheduLeakRestricted.runDecomposition();
 
         // Create Excel file
-//        ExcelLogHandler excelLogHandler = new ExcelLogHandler();
-//
-//        excelLogHandler.genRowSchedulerIntervalEvents(eventContainer);
-//        excelLogHandler.genRowBusyIntervals(biEvents);
-//        excelLogHandler.genRowBusyIntervals(observedBiEvents);
-//        //excelLogHandler.genRowSchedulerIntervalEvents(decomposedEvents);
-//
-//        // Output inferred arrival window
-//        /*
-//        EventContainer arrivalWindowEventContainer = new EventContainer();
-//        for (SchedulerIntervalEvent thisEvent : arrivalWindow.getArrivalWindowEventByTime(0)) {
-//            arrivalWindowEventContainer.add(thisEvent);
-//        }
-//        excelLogHandler.genRowSchedulerIntervalEvents(arrivalWindowEventContainer);
-//        */
-//
-//        excelLogHandler.saveAndClose(null);
+        ExcelLogHandler excelLogHandler = new ExcelLogHandler();
 
-        logger.info("The number of observed BIs: " + observedBiEvents.size());
+        excelLogHandler.genRowSchedulerIntervalEvents(eventContainer);
+        excelLogHandler.genRowBusyIntervals(biEvents);
+        excelLogHandler.genRowBusyIntervals(observedBiEvents);
+        //excelLogHandler.genRowSchedulerIntervalEvents(decomposedEvents);
 
-        logger.info(eventContainer.getAllEvents());
+        // Output inferred arrival window
+        /*
+        EventContainer arrivalWindowEventContainer = new EventContainer();
+        for (SchedulerIntervalEvent thisEvent : arrivalWindow.getArrivalWindowEventByTime(0)) {
+            arrivalWindowEventContainer.add(thisEvent);
+        }
+        excelLogHandler.genRowSchedulerIntervalEvents(arrivalWindowEventContainer);
+        */
+
+        excelLogHandler.saveAndClose(null);
+
+        loggerConsole.info("The number of observed BIs: " + observedBiEvents.size());
+
+        loggerConsole.info(eventContainer.getAllEvents());
 
     }
 }

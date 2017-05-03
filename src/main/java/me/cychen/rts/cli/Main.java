@@ -7,7 +7,6 @@ import me.cychen.rts.framework.TaskSet;
 import me.cychen.rts.scheduleak.*;
 import me.cychen.rts.simulator.QuickFPSchedulerJobContainer;
 import me.cychen.rts.simulator.QuickFixedPrioritySchedulerSimulator;
-import me.cychen.rts.simulator.TaskSetContainer;
 import me.cychen.rts.simulator.TaskSetGenerator;
 import me.cychen.util.Umath;
 import org.apache.logging.log4j.LogManager;
@@ -24,7 +23,7 @@ public class Main {
     //private static final int NUM_OF_TASKS = 15;
     private static final int NUM_OF_TASK_SETS = 10;
 
-    private static final Logger logger = LogManager.getLogger("Main");
+    private static final Logger loggerConsole = LogManager.getLogger("console");
     private static final Logger loggerExp_by_taskset = LogManager.getLogger("exp_by_taskset");
     private static final Logger loggerExp_by_util = LogManager.getLogger("exp_by_util");
     private static final Logger loggerExp_by_exp_by_numOfTasksPerTaskset = LogManager.getLogger("exp_by_numOfTasksPerTaskset");
@@ -34,7 +33,7 @@ public class Main {
         int errorCount = 0;
 
 
-        logger.info("Test starts.");
+        loggerConsole.info("Test starts.");
         loggerExp_by_taskset.trace("\n");
 
         // Generate a task set.
@@ -80,7 +79,7 @@ public class Main {
                 int taskSetCount = NUM_OF_TASK_SETS;
                 int failureCount = 0;
                 while (taskSetCount > 0) {
-                    //logger.info(thisTaskSet.toString());
+                    //loggerConsole.info(thisTaskSet.toString());
                     TaskSet thisTaskSet = taskSetGenerator.generate(numOfTasks, 1).getTaskSets().get(0);
 
                     long hyperPeriod = thisTaskSet.calHyperPeriod();
@@ -96,14 +95,14 @@ public class Main {
                     // Upper bound
                     long observationUpperBound_1 = ScheduLeakSporadic.computeObservationUpperBound_1(thisTaskSet, observerTask, victimTask);
                     //long observationUpperBound_2 = ScheduLeakSporadic.computeObservationUpperBound_2(thisTaskSet, observerTask, victimTask);
-                    //logger.info("Observation Upper bound1: " + observationUpperBound_1 + "/" + victimTask.getPeriod() + " = " + observationUpperBound_1/victimTask.getPeriod());
-                    //logger.info("Observation Upper bound2: " + observationUpperBound_2 + "/" + victimTask.getPeriod() + " = " + observationUpperBound_2/victimTask.getPeriod());
+                    //loggerConsole.info("Observation Upper bound1: " + observationUpperBound_1 + "/" + victimTask.getPeriod() + " = " + observationUpperBound_1/victimTask.getPeriod());
+                    //loggerConsole.info("Observation Upper bound2: " + observationUpperBound_2 + "/" + victimTask.getPeriod() + " = " + observationUpperBound_2/victimTask.getPeriod());
 
 //                    if (observationUpperBound_1 > 1000000) {
 //                        continue;
 //                    } else if (observationUpperBound_1 <= 0) {
 //                        errorCount++;
-//                        //logger.error("Negative upper bound!");
+//                        //loggerConsole.error("Negative upper bound!");
 //                        continue;
 //                    }
 
@@ -117,7 +116,7 @@ public class Main {
                     // New Sporadic ScheduLeak
                     ScheduLeakSporadic scheduLeakSporadic = new ScheduLeakSporadic();
                     //long victimTaskSmallestExecutionTime = scheduLeakSporadic.findTaskSmallestJobExecutionTime(simJobContainer, victimTask);
-                    //logger.info("Victim task's smallest C = " + victimTaskSmallestExecutionTime);
+                    //loggerConsole.info("Victim task's smallest C = " + victimTaskSmallestExecutionTime);
 
                     // Run simulation.
                     rmSimulator.simJobs(simJobContainer);
@@ -146,7 +145,7 @@ public class Main {
             /* Run ScheduLeak */
 //            TaskArrivalWindow arrivalWindow;
 //            if (scheduLeakSporadic.computeArrivalWindowOfTaskByIntersection(biEvents, victimTask, new Interval(victimTask.getInitialOffset(), victimTask.getInitialOffset()+victimTaskSmallestExecutionTime), SIM_DURATION)) {
-//                //logger.info("Arrival window matched! " + scheduLeakSporadic.getProcessedPeriodCount());
+//                //loggerConsole.info("Arrival window matched! " + scheduLeakSporadic.getProcessedPeriodCount());
 //                successfulInferenceCount++;
 //
 //                matchedPeriodDistribution.touch(scheduLeakSporadic.getProcessedPeriodCount());
@@ -156,7 +155,7 @@ public class Main {
 //                }
 //            }
                     //arrivalWindow = scheduLeakSporadic.getTaskArrivalWindow();
-                    //logger.info(arrivalWindow.toString());
+                    //loggerConsole.info(arrivalWindow.toString());
 
 //        if (scheduLeakSporadic.foundPeriodFactor == 0) {
 //            continue;
@@ -191,11 +190,11 @@ public class Main {
 
             loggerExp_by_exp_by_numOfTasksPerTaskset.trace("\n" + numOfTasks + "\t" + processedLcmPvPo_numOfTasksPerTaskset);
         }
-//        logger.info("Successful Inference: " + successfulInferenceCount);
-//        logger.info(" - Highest Priority Victim: " + successfulVictimHighestPriorityCount);
-//        logger.info("Distribution: \r\n" + matchedPeriodDistribution.toString());
-        logger.info("Finished.");
-        logger.error("Negative upper bound: " + errorCount);
+//        loggerConsole.info("Successful Inference: " + successfulInferenceCount);
+//        loggerConsole.info(" - Highest Priority Victim: " + successfulVictimHighestPriorityCount);
+//        loggerConsole.info("Distribution: \r\n" + matchedPeriodDistribution.toString());
+        loggerConsole.info("Finished.");
+        loggerConsole.error("Negative upper bound: " + errorCount);
 
     }
 }

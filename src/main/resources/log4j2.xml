@@ -23,9 +23,12 @@
     </Appenders>
     <Loggers>
         <Root level="error">
-            <AppenderRef ref="Console" />
+            <!--<AppenderRef ref="Console" />-->
             <AppenderRef ref="MainLogFile"/>
         </Root>
+        <Logger name="console" level="TRACE">
+            <AppenderRef ref="Console" />
+        </Logger>
         <Logger name="exp1" level="TRACE">
             <AppenderRef ref="ExpLogFile1"/>
         </Logger>
