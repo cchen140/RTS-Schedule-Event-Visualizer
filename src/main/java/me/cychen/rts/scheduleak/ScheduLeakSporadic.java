@@ -104,6 +104,7 @@ public class ScheduLeakSporadic {
 
         }
         if (hasFoundArrival == true) {
+            foundPeriodFactor = foundPeriodFactor- initialPeriodFactor + 1;
             logger.info("Arrival is found: " + foundPeriodFactor + "x" + inVictim.getPeriod() + " = " + foundPeriodFactor * inVictim.getPeriod());
         }
         return executionMap;

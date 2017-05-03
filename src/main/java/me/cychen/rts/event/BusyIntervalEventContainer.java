@@ -188,6 +188,9 @@ public class BusyIntervalEventContainer {
                     observedBi.addIntervalEvent(thisEvent);
                 }
             }
+            if (isConstructingBi == true) {
+                throw new AssertionError();
+            }
         }
 
         return observedBis;
