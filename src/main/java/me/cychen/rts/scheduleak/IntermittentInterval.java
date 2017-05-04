@@ -14,6 +14,10 @@ public class IntermittentInterval {
         intervals.addAll(inIntervals);
     }
 
+    public IntermittentInterval(Interval inInterval) {
+        intervals.add(inInterval);
+    }
+
     public long getBegin() {
         long begin = 0;
         Boolean firstLoop = true;
@@ -128,6 +132,29 @@ public class IntermittentInterval {
         return resultInterInterval;
     }
 
+    public IntermittentInterval getSubtraction(Interval inInterval) {
+        ArrayList<Interval> resultIntervals = new ArrayList<>();
+        for (Interval thisInterval : intervals) {
+            resultIntervals.addAll(thisInterval.minus(inInterval));
+        }
+        return new IntermittentInterval(resultIntervals);
+    }
+
+    public IntermittentInterval getSubtraction(IntermittentInterval interInterval) {
+        IntermittentInterval resultInterInterval = new IntermittentInterval(intervals);
+        for (Interval thisInterval : interInterval.intervals) {
+            resultInterInterval = resultInterInterval.getSubtraction(thisInterval);
+        }
+        return resultInterInterval;
+    }
+
+    public void minus(Interval inInterval) {
+        intervals = getSubtraction(inInterval).intervals;
+    }
+    public void minus(IntermittentInterval interInterval) {
+        intervals = getSubtraction(interInterval).intervals;
+    }
+
     public Boolean hasInterval(Interval inInterval) {
         for (Interval thisInterval : intervals) {
             if (thisInterval.isEqual(inInterval)) {
@@ -135,6 +162,22 @@ public class IntermittentInterval {
             }
         }
         return false;
+    }
+
+    public Interval getLongestInterval() {
+        Interval longestInterval = null;
+        Boolean firstLoop = true;
+        for (Interval thisInterval : intervals) {
+            if (firstLoop == true) {
+                longestInterval = thisInterval;
+                firstLoop = false;
+            }
+
+            if (thisInterval.getLength() > longestInterval.getLength()) {
+                longestInterval = thisInterval;
+            }
+        }
+        return longestInterval;
     }
 
     @Override

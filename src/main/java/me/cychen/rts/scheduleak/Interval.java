@@ -40,6 +40,8 @@ public class Interval {
     }
 
     /* Calculate intersection and return a new Interval object. */
+    // [a, b)
+    // so [a,b) intersect with [b,c) equals nothing.
     public Interval intersect(Interval inInterval)
     {
         Interval leftInterval, rightInterval;
@@ -78,7 +80,12 @@ public class Interval {
             resultEnd = rightInterval.getEnd();
         }
 
-        return new Interval(resultBegin, resultEnd);
+        if (resultBegin == resultEnd) {
+            // [a,b) intersect with [b,c) equals nothing.
+            return null;
+        } else {
+            return new Interval(resultBegin, resultEnd);
+        }
     }
 
     public void shift(long inOffset)
@@ -125,6 +132,27 @@ public class Interval {
         } else {
             resultIntervals.add(new Interval(this));
             resultIntervals.add(new Interval(inInterval));
+        }
+
+        return resultIntervals;
+    }
+
+    public ArrayList<Interval> minus(Interval inInterval) {
+        ArrayList<Interval> resultIntervals = new ArrayList<>();
+        Interval intersectedInterval = intersect(inInterval);
+
+        if (intersect(inInterval) == null) {
+            // return untouched interval.
+            resultIntervals.add(new Interval(begin, end));
+            return resultIntervals;
+        }
+
+        if (begin < intersectedInterval.begin) {
+            resultIntervals.add(new Interval(begin, intersectedInterval.begin));
+        }
+
+        if (end > intersectedInterval.end) {
+            resultIntervals.add(new Interval(intersectedInterval.end, end));
         }
 
         return resultIntervals;

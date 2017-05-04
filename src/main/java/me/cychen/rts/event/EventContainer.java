@@ -193,4 +193,22 @@ public class EventContainer {
     {
         return (inTargetValue>=inBegin && inTargetValue<=inEnd) ? true : false;
     }
+
+    public void removeEventsBeforeButExcludeTimeStamp(long inTimeStamp) {
+        ArrayList<SchedulerIntervalEvent> schedulerIntervalEventsToBeRemoved = new ArrayList<>();
+        for (SchedulerIntervalEvent thisSchedulerEvent : schedulerEvents) {
+            if (thisSchedulerEvent.getOrgEndTimestamp() < inTimeStamp) {
+                schedulerIntervalEventsToBeRemoved.add(thisSchedulerEvent);
+            }
+        }
+        schedulerEvents.removeAll(schedulerIntervalEventsToBeRemoved);
+
+        ArrayList<TaskInstantEvent> taskInstantEventsToBeRemoved = new ArrayList<>();
+        for (TaskInstantEvent thisInstantEvent : taskInstantEvents) {
+            if (thisInstantEvent.getOrgTimestamp() < inTimeStamp) {
+                taskInstantEventsToBeRemoved.add(thisInstantEvent);
+            }
+        }
+        taskInstantEvents.removeAll(taskInstantEventsToBeRemoved);
+    }
 }
