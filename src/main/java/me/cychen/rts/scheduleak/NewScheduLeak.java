@@ -15,6 +15,7 @@ public class NewScheduLeak {
     IntermittentInterval arrivalWindow;
     Task observer, victim;
     long inferredArrivalTime = 0;
+    long trueArrivalTime;
 
     /* NOT IN ALGO: */
     /* Trace Variables */
@@ -25,6 +26,7 @@ public class NewScheduLeak {
     public NewScheduLeak(Task observer, Task victim) {
         this.observer = observer;
         this.victim = victim;
+        trueArrivalTime = victim.getInitialOffset();
         arrivalWindow = new IntermittentInterval(new Interval(0, victim.getPeriod()));   // Initialize the inference window with the victim's period.
     }
 
@@ -61,7 +63,7 @@ public class NewScheduLeak {
             /* NOT IN ALGO: */
             /* Check with ground truth */
             if (isArrivalTimeInferredCorrectly == false) {
-                if (isArrivalWindowCorrectWithoutVariation() == true) {
+                if (inferArrivalTime() == trueArrivalTime) {
                     isArrivalTimeInferredCorrectly = true;
                     inferenceSuccessTime = thisEvent.getOrgEndTimestamp();
                 }
@@ -95,29 +97,29 @@ public class NewScheduLeak {
         }
     }
 
-    public Boolean isArrivalWindowCorrectRough() {
-        if (arrivalWindow.intervals.size() != 1) {
-            return false;
-        }
-
-        if (arrivalWindow.getBegin() == victim.getInitialOffset()) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public Boolean isArrivalWindowCorrectWithoutVariation() {
-        if (arrivalWindow.intervals.size() != 1) {
-            return false;
-        }
-
-        if ( (arrivalWindow.getBegin()==victim.getInitialOffset()) && (arrivalWindow.intervals.get(0).getLength()==victim.getExecTime())) {
-            return true;
-        }
-
-        return false;
-    }
+//    public Boolean isArrivalWindowCorrectRough() {
+//        if (arrivalWindow.intervals.size() != 1) {
+//            return false;
+//        }
+//
+//        if (arrivalWindow.getBegin() == victim.getInitialOffset()) {
+//            return true;
+//        }
+//
+//        return false;
+//    }
+//
+//    public Boolean isArrivalWindowCorrectWithoutVariation() {
+//        if (arrivalWindow.intervals.size() != 1) {
+//            return false;
+//        }
+//
+//        if ( (arrivalWindow.getBegin()==victim.getInitialOffset()) && (arrivalWindow.intervals.get(0).getLength()==victim.getExecTime())) {
+//            return true;
+//        }
+//
+//        return false;
+//    }
 
     public double computeArrivalInferencePrecision() {
         long pv = victim.getPeriod();

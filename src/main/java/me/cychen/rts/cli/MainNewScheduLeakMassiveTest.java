@@ -26,7 +26,7 @@ public class MainNewScheduLeakMassiveTest {
     public static void main(String[] args) {
 
         /* Title row */
-        loggerExp_by_taskset.trace("#util \t precision \t successTimeByLcm");
+        loggerExp_by_taskset.trace("util \t O \t precision \t successTimeByLcm");
         loggerExp_by_util.trace("#util \t averagePrecision \t successRate \t averageSuccessTimeByLcm");
         loggerExp_by_exp_by_numOfTasksPerTaskset.trace("#numOfTasks \t averagePrecision \t successRate");
 
@@ -51,7 +51,7 @@ public class MainNewScheduLeakMassiveTest {
 
                     /* Test per condition */
                     double cumulativeInferencePrecision = 0;
-                    long cumulativeSuccessTimeByLcm = 0;
+                    double cumulativeSuccessTimeByLcm = 0;
                     int successCount = 0;
                     for (int testId = 1; testId <= NUM_OF_TEST_PER_CONDITION; testId++) {
                         loggerConsole.info("#" + testId + " begins:");
@@ -116,10 +116,10 @@ public class MainNewScheduLeakMassiveTest {
                         singleNewScheduLeakTest.run();
 
                         double inferencePrecision = singleNewScheduLeakTest.scheduLeak.inferencePrecision;
-                        long successTimeByLcm = (long) (singleNewScheduLeakTest.scheduLeak.inferenceSuccessTime/lcm);
+                        double successTimeByLcm = singleNewScheduLeakTest.scheduLeak.inferenceSuccessTime/lcm;
 
-                        //loggerExp_by_taskset.trace("util \t precision \t successTimeByLcm");
-                        loggerExp_by_taskset.trace("\r\n{}\t{}\t{}", doubleToString(util), doubleToString(inferencePrecision), successTimeByLcm);
+                        //loggerExp_by_taskset.trace("util \t O \t precision \t successTimeByLcm");
+                        loggerExp_by_taskset.trace("\r\n{}\t{}\t{}\t{}", doubleToString(util), doubleToString(observationRatio), doubleToString(inferencePrecision), doubleToString(successTimeByLcm));
 
                         /* Success count and cumulative time */
                         if (singleNewScheduLeakTest.scheduLeak.inferencePrecision == 1.0) {
@@ -130,10 +130,10 @@ public class MainNewScheduLeakMassiveTest {
                         cumulativeInferencePrecision += singleNewScheduLeakTest.scheduLeak.inferencePrecision;
                     }/* Test per condition */
 
-                    double averagePrecisionForUtil = cumulativeInferencePrecision/NUM_OF_TEST_PER_CONDITION;
+                    double averagePrecisionForUtil = cumulativeInferencePrecision/(double)NUM_OF_TEST_PER_CONDITION;
                     double averageSuccessTimeByLcm;
-                    averageSuccessTimeByLcm = successCount==0 ? 0 : cumulativeSuccessTimeByLcm/successCount;
-                    double successRate = successCount/NUM_OF_TEST_PER_CONDITION;
+                    averageSuccessTimeByLcm = successCount==0 ? 0 : cumulativeSuccessTimeByLcm/(double)successCount;
+                    double successRate = successCount/(double)NUM_OF_TEST_PER_CONDITION;
 
                     //loggerExp_by_util.trace("util \t averagePrecision \t successRate \t averageSuccessTimeByLcm");
                     loggerExp_by_util.trace("\r\n{}\t{}\t{}\t{}", doubleToString(util), doubleToString(averagePrecisionForUtil), doubleToString(successRate), doubleToString(averageSuccessTimeByLcm));
