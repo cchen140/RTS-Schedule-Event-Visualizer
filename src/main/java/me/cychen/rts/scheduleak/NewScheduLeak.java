@@ -46,9 +46,16 @@ public class NewScheduLeak {
 
     public void computeArrivalWindowFromObserverSchedulerEvents(ArrayList<SchedulerIntervalEvent> inSchedulerEvents) {
         long lastTimestamp = 0;
+        long firstTimestamp = 0;
+        Boolean firstLoop = true;
         for (SchedulerIntervalEvent thisEvent : inSchedulerEvents) {
             if (thisEvent.getTask() != observer) {
                 continue;
+            }
+
+            if (firstLoop == true) {
+                firstLoop = false;
+                firstTimestamp = thisEvent.getOrgBeginTimestamp();
             }
 
             if (thisEvent.getOrgBeginTimestamp() < lastTimestamp) {
@@ -65,7 +72,7 @@ public class NewScheduLeak {
             if (isArrivalTimeInferredCorrectly == false) {
                 if (inferArrivalTime() == trueArrivalTime) {
                     isArrivalTimeInferredCorrectly = true;
-                    inferenceSuccessTime = thisEvent.getOrgEndTimestamp();
+                    inferenceSuccessTime = thisEvent.getOrgEndTimestamp() - firstTimestamp;
                 }
             }
         }

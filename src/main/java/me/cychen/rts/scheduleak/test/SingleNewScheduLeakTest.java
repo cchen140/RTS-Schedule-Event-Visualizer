@@ -65,7 +65,7 @@ public class SingleNewScheduLeakTest {
 //        loggerConsole.info("Victim Task: " + victim.toString());
 //        loggerConsole.info("O(ov) = " + observer.getExecTime()/gcd);
 //        loggerConsole.info("Sim time = " + (simDuration-hyperPeriod)/lcm);
-//        loggerConsole.info("Answer Obtained at " + (scheduLeak.inferenceSuccessTime-hyperPeriod)/lcm);
+//        loggerConsole.info("Answer Obtained at " + scheduLeak.inferenceSuccessTime/lcm);
 //        loggerConsole.info(scheduLeak.getArrivalWindow().toString());
     }
 }

@@ -26,8 +26,8 @@ public class MainNewScheduLeakMassiveTest {
     public static void main(String[] args) {
 
         /* Title row */
-        loggerExp_by_taskset.trace("util \t O \t precision \t successTimeByLcm");
-        loggerExp_by_util.trace("#util \t averagePrecision \t successRate \t averageSuccessTimeByLcm");
+        loggerExp_by_taskset.trace("#util \t O \t precision \t successTimeByLcm \t successTimeByHpRatio");
+        loggerExp_by_util.trace("#util \t averagePrecision \t successRate \t averageSuccessTimeByLcm \t averageSuccessTimeByHpRatio");
         loggerExp_by_exp_by_numOfTasksPerTaskset.trace("#numOfTasks \t averagePrecision \t successRate");
 
         //for (int victimPriorityMode=1; victimPriorityMode<=3 ; victimPriorityMode++) {
@@ -52,6 +52,7 @@ public class MainNewScheduLeakMassiveTest {
                     /* Test per condition */
                     double cumulativeInferencePrecision = 0;
                     double cumulativeSuccessTimeByLcm = 0;
+                    double cumulativeSuccessTimeByHpRatio = 0;
                     int successCount = 0;
                     for (int testId = 1; testId <= NUM_OF_TEST_PER_CONDITION; testId++) {
                         loggerConsole.info("#" + testId + " begins:");
@@ -117,26 +118,28 @@ public class MainNewScheduLeakMassiveTest {
 
                         double inferencePrecision = singleNewScheduLeakTest.scheduLeak.inferencePrecision;
                         double successTimeByLcm = singleNewScheduLeakTest.scheduLeak.inferenceSuccessTime/lcm;
+                        double successTimeByHpRatio = singleNewScheduLeakTest.scheduLeak.inferenceSuccessTime/(double)hyperPeriod;
 
-                        //loggerExp_by_taskset.trace("util \t O \t precision \t successTimeByLcm");
-                        loggerExp_by_taskset.trace("\r\n{}\t{}\t{}\t{}", doubleToString(util), doubleToString(observationRatio), doubleToString(inferencePrecision), doubleToString(successTimeByLcm));
+                        //loggerExp_by_taskset.trace("util \t O \t precision \t successTimeByLcm \t successTimeByHpRatio");
+                        loggerExp_by_taskset.trace("\r\n{}\t{}\t{}\t{}\t{}", doubleToString(util), doubleToString(observationRatio), doubleToString(inferencePrecision), doubleToString(successTimeByLcm), doubleToString(successTimeByHpRatio));
 
                         /* Success count and cumulative time */
                         if (singleNewScheduLeakTest.scheduLeak.inferencePrecision == 1.0) {
                             successCount++;
                             cumulativeSuccessTimeByLcm += singleNewScheduLeakTest.scheduLeak.inferenceSuccessTime/lcm;
+                            cumulativeSuccessTimeByHpRatio += successTimeByHpRatio;
                         }
 
                         cumulativeInferencePrecision += singleNewScheduLeakTest.scheduLeak.inferencePrecision;
                     }/* Test per condition */
 
                     double averagePrecisionForUtil = cumulativeInferencePrecision/(double)NUM_OF_TEST_PER_CONDITION;
-                    double averageSuccessTimeByLcm;
-                    averageSuccessTimeByLcm = successCount==0 ? 0 : cumulativeSuccessTimeByLcm/(double)successCount;
+                    double averageSuccessTimeByLcm = successCount==0 ? 0 : cumulativeSuccessTimeByLcm/(double)successCount;
+                    double averageSuccessTimeByHpRatio = successCount==0 ? 0 : cumulativeSuccessTimeByHpRatio/(double)successCount;
                     double successRate = successCount/(double)NUM_OF_TEST_PER_CONDITION;
 
-                    //loggerExp_by_util.trace("util \t averagePrecision \t successRate \t averageSuccessTimeByLcm");
-                    loggerExp_by_util.trace("\r\n{}\t{}\t{}\t{}", doubleToString(util), doubleToString(averagePrecisionForUtil), doubleToString(successRate), doubleToString(averageSuccessTimeByLcm));
+                    //loggerExp_by_util.trace("util \t averagePrecision \t successRate \t averageSuccessTimeByLcm \t averageSuccessTimeByHpRatio");
+                    loggerExp_by_util.trace("\r\n{}\t{}\t{}\t{}\t{}", doubleToString(util), doubleToString(averagePrecisionForUtil), doubleToString(successRate), doubleToString(averageSuccessTimeByLcm), doubleToString(averageSuccessTimeByHpRatio));
 
                     cumulativeSuccessCount += successCount;
                     cumulativePrecisionForNumOfTasks += averagePrecisionForUtil;
