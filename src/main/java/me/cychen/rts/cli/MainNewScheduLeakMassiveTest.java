@@ -30,9 +30,14 @@ public class MainNewScheduLeakMassiveTest {
         loggerExp_by_util.trace("#util \t averagePrecision \t successRate \t averageSuccessTimeByLcm \t averageSuccessTimeByHpRatio");
         loggerExp_by_exp_by_numOfTasksPerTaskset.trace("#numOfTasks \t averagePrecision \t successRate");
 
-        //for (int victimPriorityMode=1; victimPriorityMode<=3 ; victimPriorityMode++) {
-        {
-            int victimPriorityMode=1;
+        for (int victimPriorityMode=1; victimPriorityMode<=3 ; victimPriorityMode++) {
+            loggerConsole.info("##### victim priority mode = " + victimPriorityMode + " #####");
+
+            loggerExp_by_taskset.trace("\r\n\r\n#victimMode={}", victimPriorityMode);
+            loggerExp_by_util.trace("\r\n\r\n#victimMode={}", victimPriorityMode);
+            loggerExp_by_exp_by_numOfTasksPerTaskset.trace("\r\n\r\n#victimMode={}", victimPriorityMode);
+
+            //int victimPriorityMode=1;
             int observerPriority = 1;
             int victimPriority = 0; // to be computed later.
 
