@@ -20,6 +20,9 @@
         <File name="ExpLogFile_by_numOfTasksPerTaskset" fileName="exp_by_numOfTasksPerTaskset.log" immediateFlush="true" append="false">
             <PatternLayout pattern="%msg"/>
         </File>
+        <File name="ExpLogFile_by_timeVsSuccessRate" fileName="exp_by_timeVsSuccessRate.log" immediateFlush="true" append="false">
+            <PatternLayout pattern="%msg"/>
+        </File>
     </Appenders>
     <Loggers>
         <Root level="error">
@@ -40,6 +43,9 @@
         </Logger>
         <Logger name="exp_by_numOfTasksPerTaskset" level="TRACE">
             <AppenderRef ref="ExpLogFile_by_numOfTasksPerTaskset"/>
+        </Logger>
+        <Logger name="exp_by_timeVsSuccessRate" level="TRACE">
+            <AppenderRef ref="ExpLogFile_by_timeVsSuccessRate"/>
         </Logger>
     </Loggers>
 </Configuration>

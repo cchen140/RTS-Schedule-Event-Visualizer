@@ -298,8 +298,8 @@ public class TaskSet {
         return true;
     }
 
-    // Code modified from Man-Ki's code
-    long calc_WCRT(Task task_i) {
+    // Code modified from Man-Ki's code (compute worst case response time)
+    public long calc_WCRT(Task task_i) {
         int numItr = 0;
         long Wi = task_i.getExecTime();
         long prev_Wi = 0;

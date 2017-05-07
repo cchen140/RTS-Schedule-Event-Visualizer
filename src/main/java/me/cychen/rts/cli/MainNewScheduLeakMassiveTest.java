@@ -16,7 +16,7 @@ import java.text.DecimalFormat;
  */
 public class MainNewScheduLeakMassiveTest {
     //private static long SIM_DURATION = 500000;
-    private static long NUM_OF_TEST_PER_CONDITION = 10;
+    private static long NUM_OF_TEST_PER_CONDITION = 100;
 
     private static final Logger loggerConsole = LogManager.getLogger("console");
     private static final Logger loggerExp_by_taskset = LogManager.getLogger("exp_by_taskset");
@@ -76,8 +76,8 @@ public class MainNewScheduLeakMassiveTest {
 
                         taskSetGenerator.setNonHarmonicOnly(true);
 
-                        taskSetGenerator.setMaxHyperPeriod(2 * 3 * 5 * 7 * 11 * 13 * 15);
-                        taskSetGenerator.setGenerateFromHpDivisors(true);
+                        //taskSetGenerator.setMaxHyperPeriod(2 * 3 * 5 * 7 * 11 * 13 * 15);
+                        //taskSetGenerator.setGenerateFromHpDivisors(true);
 
                         /* Optimal attack condition experiment. */
                         taskSetGenerator.setNeedGenObserverTask(true);
@@ -119,7 +119,8 @@ public class MainNewScheduLeakMassiveTest {
                         loggerConsole.info("\t O(o,v) = " + observationRatio);
 
                         SingleNewScheduLeakTest singleNewScheduLeakTest = new SingleNewScheduLeakTest(taskSet, observer, victim);
-                        singleNewScheduLeakTest.run();
+                        singleNewScheduLeakTest.desiredConfidentLevel = 0.95;
+                        singleNewScheduLeakTest.run(0);
 
                         double inferencePrecision = singleNewScheduLeakTest.scheduLeak.inferencePrecision;
                         double successTimeByLcm = singleNewScheduLeakTest.scheduLeak.inferenceSuccessTime/lcm;

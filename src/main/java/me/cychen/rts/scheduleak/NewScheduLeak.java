@@ -5,6 +5,8 @@ import me.cychen.rts.event.BusyIntervalEventContainer;
 import me.cychen.rts.event.EventContainer;
 import me.cychen.rts.event.SchedulerIntervalEvent;
 import me.cychen.rts.framework.Task;
+import me.cychen.rts.framework.TaskSet;
+import me.cychen.util.Umath;
 
 import java.util.ArrayList;
 
@@ -15,18 +17,23 @@ public class NewScheduLeak {
     IntermittentInterval arrivalWindow;
     Task observer, victim;
     long inferredArrivalTime = 0;
-    long trueArrivalTime;
+
 
     /* NOT IN ALGO: */
     /* Trace Variables */
+    TaskSet taskSet;
+    long trueArrivalTime;
     public Boolean isArrivalTimeInferredCorrectly = false;
+    public Boolean isArrivalWindowCleared = false;
     public long inferenceSuccessTime = 0;
+    public long arrivalWindowClearedTime = 0;
     public double inferencePrecision = 0;
 
-    public NewScheduLeak(Task observer, Task victim) {
+    public NewScheduLeak(Task observer, Task victim, TaskSet inTaskSet) {
+        taskSet = inTaskSet;    // for analysis only.
         this.observer = observer;
         this.victim = victim;
-        trueArrivalTime = victim.getInitialOffset();
+        trueArrivalTime = victim.getInitialOffset();    // for analysis only.
         arrivalWindow = new IntermittentInterval(new Interval(0, victim.getPeriod()));   // Initialize the inference window with the victim's period.
     }
 
@@ -75,6 +82,12 @@ public class NewScheduLeak {
                     inferenceSuccessTime = thisEvent.getOrgEndTimestamp() - firstTimestamp;
                 }
             }
+            if (isArrivalWindowCleared == false) {
+                if (isArrivalWindowCleared() == true) {
+                    isArrivalWindowCleared = true;
+                    arrivalWindowClearedTime = thisEvent.getOrgEndTimestamp() - firstTimestamp;
+                }
+            }
         }
 
         inferredArrivalTime = inferArrivalTime();
@@ -116,17 +129,17 @@ public class NewScheduLeak {
 //        return false;
 //    }
 //
-//    public Boolean isArrivalWindowCorrectWithoutVariation() {
-//        if (arrivalWindow.intervals.size() != 1) {
-//            return false;
-//        }
-//
-//        if ( (arrivalWindow.getBegin()==victim.getInitialOffset()) && (arrivalWindow.intervals.get(0).getLength()==victim.getExecTime())) {
-//            return true;
-//        }
-//
-//        return false;
-//    }
+    public Boolean isArrivalWindowCleared() {
+        if (arrivalWindow.intervals.size() != 1) {
+            return false;
+        }
+
+        if ( (arrivalWindow.getBegin()==victim.getInitialOffset()) && (arrivalWindow.intervals.get(0).getLength()==victim.getExecTime())) {
+            return true;
+        }
+
+        return false;
+    }
 
     public double computeArrivalInferencePrecision() {
         long pv = victim.getPeriod();
@@ -138,5 +151,78 @@ public class NewScheduLeak {
             inferencePrecision =  1- (delta/(pv/2.0));
         }
         return inferencePrecision;
+    }
+
+    public double computeProbabilityOfAnyTaskBeingObservedAtASlot() {
+        long po = observer.getPeriod();
+        long pv = victim.getPeriod();
+        long lcmPoPv = Umath.lcm(po, pv);
+        long gcdPoPv = Umath.gcd(po, pv);
+
+        double antiOohp = 1;    // antiOohp is the probability of no any task being observed at a slot in a lcmPoPv period
+        for (Task thisTask : taskSet.getHigherPriorityTasks(observer.getPriority())) {
+            if (thisTask == victim) {
+                continue;
+            }
+
+            long ph = thisTask.getPeriod();
+            long eh = thisTask.getExecTime();
+            long lcmPoPh = Umath.lcm(po, ph);
+            long lcmPoPvPh = Umath.lcm(lcmPoPh, pv);
+            long gcdPoPh = Umath.gcd(po, ph);
+            double observationRatio = (double) observer.getExecTime()/(double)gcdPoPv;
+
+            long hWcrt = taskSet.calc_WCRT(thisTask);
+//            double Ooh = (double)hWcrt/(double)(lcmPoPh); // ooh is the probability of the task h bing observed at a slot in a lcmPoPv period.
+//            if (Ooh > 1.0) {
+//                antiOohp = Ooh;
+//            }
+            double Ooh = (double)lcmPoPv/(double)(lcmPoPvPh);
+
+//            if (observationRatio>1.0) {
+//                Ooh = Ooh/observationRatio;
+//            }
+
+            antiOohp *= (1.0-Ooh);
+        }
+        return 1.0-antiOohp;
+    }
+
+    public double computeConfidenceLevelOverLcmPoPvTime(long inLcmPoPvTime) {
+        double Oohp = computeProbabilityOfAnyTaskBeingObservedAtASlot();
+
+        if (Oohp >= 1) {
+            // This means that some h tasks can appear at the same frequency as the victim task, so it's impossible to solve the problem.
+            return 0;
+        }
+
+        double antiConfidence = 1;
+        for (long t=0; t<inLcmPoPvTime; t++) {
+            antiConfidence *= Oohp;
+        }
+        double confidenceLevel = 1- antiConfidence;
+        return confidenceLevel;
+    }
+
+    public long computeLcmPoPvTimesByConfidenceLevel(double inConfidence) {
+        if (inConfidence<=0 || inConfidence>=1) {
+            return 0;
+        }
+
+        double Oohp = computeProbabilityOfAnyTaskBeingObservedAtASlot();
+        if (Oohp >= 1) {
+            // This means that some h tasks can appear at the same frequency as the victim task, so it's impossible to solve the problem.
+            return 0;   // Note that only this case it returns 0, otherwise this function will return the number >= 1.
+        }
+
+        double currentConfidence = 0;
+        double lastAntiConfidence = 1;
+        long time = 0;
+        while (currentConfidence < inConfidence) {
+            time++;
+            lastAntiConfidence *= Oohp;
+            currentConfidence = 1.0 - lastAntiConfidence;
+        }
+        return time;
     }
 }

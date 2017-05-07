@@ -36,20 +36,20 @@ public class MainNewScheduLeak {
         //taskSetGenerator.setMaxExecTime(20);
         //taskSetGenerator.setMinExecTime(5);
 
-        taskSetGenerator.setMaxUtil(0.6);
-        taskSetGenerator.setMinUtil(0.5);
+        taskSetGenerator.setMaxUtil(0.9);
+        taskSetGenerator.setMinUtil(0.8);
 
         taskSetGenerator.setNonHarmonicOnly(true);
 
-        taskSetGenerator.setMaxHyperPeriod(2*3*5*7*11*13*15);
-        taskSetGenerator.setGenerateFromHpDivisors(true);
+        //taskSetGenerator.setMaxHyperPeriod(2*3*5*7*11*13*15);
+        //taskSetGenerator.setGenerateFromHpDivisors(true);
 
         /* Optimal attack condition experiment. */
         taskSetGenerator.setNeedGenObserverTask(true);
         taskSetGenerator.setObserverTaskPriority(OBSERVER_PRI);
         taskSetGenerator.setVictimTaskPriority(VICTIM_PRI);
 
-        taskSetGenerator.setMaxObservationRatio(999);
+        taskSetGenerator.setMaxObservationRatio(2);
         taskSetGenerator.setMinObservationRatio(1);
 
         TaskSetContainer taskSets = taskSetGenerator.generate(15, 1);
@@ -67,7 +67,8 @@ public class MainNewScheduLeak {
 
 
         SingleNewScheduLeakTest singleNewScheduLeakTest = new SingleNewScheduLeakTest(taskSet, observer, victim);
-        singleNewScheduLeakTest.run();
+        singleNewScheduLeakTest.desiredConfidentLevel = 0.5;
+        singleNewScheduLeakTest.run(0);
 
     }
 
