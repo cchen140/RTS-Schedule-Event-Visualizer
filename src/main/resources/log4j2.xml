@@ -23,6 +23,15 @@
         <File name="ExpLogFile_by_timeVsSuccessRate" fileName="exp_by_timeVsSuccessRate.log" immediateFlush="true" append="false">
             <PatternLayout pattern="%msg"/>
         </File>
+        <File name="ExpLogFile_by_victimPriorityPrecision" fileName="exp_by_victimPriorityPrecision.log" immediateFlush="true" append="false">
+            <PatternLayout pattern="%msg"/>
+        </File>
+        <File name="ExpLogFile_by_victimPriorityTime" fileName="exp_by_victimPriorityTime.log" immediateFlush="true" append="false">
+            <PatternLayout pattern="%msg"/>
+        </File>
+        <File name="ExpLogFile_by_arrivalModel" fileName="exp_by_arrivalMode.log" immediateFlush="true" append="false">
+            <PatternLayout pattern="%msg"/>
+        </File>
     </Appenders>
     <Loggers>
         <Root level="error">
@@ -46,6 +55,15 @@
         </Logger>
         <Logger name="exp_by_timeVsSuccessRate" level="TRACE">
             <AppenderRef ref="ExpLogFile_by_timeVsSuccessRate"/>
+        </Logger>
+        <Logger name="exp_by_victimPriorityPrecision" level="TRACE">
+            <AppenderRef ref="ExpLogFile_by_victimPriorityPrecision"/>
+        </Logger>
+        <Logger name="exp_by_victimPriorityTime" level="TRACE">
+            <AppenderRef ref="ExpLogFile_by_victimPriorityTime"/>
+        </Logger>
+        <Logger name="exp_by_arrivalModel" level="TRACE">
+            <AppenderRef ref="ExpLogFile_by_arrivalModel"/>
         </Logger>
     </Loggers>
 </Configuration>

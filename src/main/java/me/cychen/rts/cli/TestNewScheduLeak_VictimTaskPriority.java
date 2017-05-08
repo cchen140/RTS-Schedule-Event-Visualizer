@@ -12,57 +12,62 @@ import org.apache.logging.log4j.Logger;
 import java.text.DecimalFormat;
 
 /**
- * Created by cy on 5/6/2017.
+ * Created by cy on 5/7/2017.
  */
-public class TestNewScheduLeak_TimeVsSuccessRate {
+public class TestNewScheduLeak_VictimTaskPriority {
 
     //private static long SIM_DURATION = 500000;
-    private static long NUM_OF_TEST_PER_CONDITION = 5;
+    private static long NUM_OF_TEST_PER_CONDITION = 20;
 
     private static final Logger loggerConsole = LogManager.getLogger("console");
     private static final Logger loggerExp_by_taskset = LogManager.getLogger("exp_by_taskset");
     private static final Logger loggerExp_by_util = LogManager.getLogger("exp_by_util");
     private static final Logger loggerExp_by_exp_by_numOfTasksPerTaskset = LogManager.getLogger("exp_by_numOfTasksPerTaskset");
     private static final Logger loggerExp_by_exp_by_timeVsSuccessRate = LogManager.getLogger("exp_by_timeVsSuccessRate");
+    private static final Logger loggerExp_by_victimPriorityPrecision = LogManager.getLogger("exp_by_victimPriorityPrecision");
+    private static final Logger loggerExp_by_victimPriorityTime = LogManager.getLogger("exp_by_victimPriorityTime");
 
     public static void main(String[] args) {
 
         /* Title row */
-        loggerExp_by_taskset.trace("util \t O \t precision \t simTimeByLcm \t successTimeByLcm \t successTimeByHpRatio \t predictedTimeToSuccess \t confidenceLevel");
+        loggerExp_by_taskset.trace("#util \t O \t precision \t simTimeByLcm \t successTimeByLcm \t successTimeByHpRatio \t predictedTimeToSuccess");
         loggerExp_by_util.trace("#util \t averagePrecision \t successRate \t averageSuccessTimeByLcm \t averageSuccessTimeByHpRatio");
-        loggerExp_by_exp_by_numOfTasksPerTaskset.trace("#numOfTasks \t averagePrecision \t successRate");
-        loggerExp_by_exp_by_timeVsSuccessRate.trace("#time \t AnalyticalSuccessRate \t trueSuccessRate \t averagePrecisionRatio");
+        loggerExp_by_exp_by_numOfTasksPerTaskset.trace("#numOfTasks \t averagePrecision \t successRate \t averagePredictedTimeToSuccess");
+        loggerExp_by_exp_by_timeVsSuccessRate.trace("#AnalyticalSuccessRate \t trueSuccessRate \t averagePrecisionRatio");
 
-        for (int simTimeByLcmPoPv=1; simTimeByLcmPoPv<=20; simTimeByLcmPoPv++) {
-            loggerConsole.info("##### sim time = " + simTimeByLcmPoPv + " #####");
+        loggerExp_by_victimPriorityPrecision.trace("\r\n Mode\t5\t7\t9\t11\t13\t15");
+        loggerExp_by_victimPriorityTime.trace("\r\n Mode\t5\t7\t9\t11\t13\t15");
 
-            loggerExp_by_taskset.trace("\r\n\r\n#simTime={}", simTimeByLcmPoPv);
-            loggerExp_by_util.trace("\r\n\r\n#simTime={}", simTimeByLcmPoPv);
-            loggerExp_by_exp_by_numOfTasksPerTaskset.trace("\r\n\r\n#simTime={}", simTimeByLcmPoPv);
 
+        //for (int simTimeByLcmPoPv=1; simTimeByLcmPoPv<=20; simTimeByLcmPoPv++) {
+        {
             double cumulativeConfidenceLevel = 0;
             double cumulativeSuccessCountBySimTime = 0;
             double cumulativePrecisionBySimTime = 0;
             for (int victimPriorityMode = 1; victimPriorityMode <= 3; victimPriorityMode++) {
-            //{
-            //    int victimPriorityMode=1;
+                //{
+                //    int victimPriorityMode=1;
                 loggerConsole.info("##### victim priority mode = " + victimPriorityMode + " #####");
 
                 loggerExp_by_taskset.trace("\r\n\r\n#victimMode={}", victimPriorityMode);
                 loggerExp_by_util.trace("\r\n\r\n#victimMode={}", victimPriorityMode);
                 loggerExp_by_exp_by_numOfTasksPerTaskset.trace("\r\n\r\n#victimMode={}", victimPriorityMode);
 
+                loggerExp_by_victimPriorityPrecision.trace("\r\nvictimMode{}\t", victimPriorityMode);
+                loggerExp_by_victimPriorityTime.trace("\r\nvictimMode{}\t", victimPriorityMode);
+
                 int observerPriority = 1;
                 int victimPriority = 0; // to be computed later.
 
                 /* Number of tasks loop*/
-                for (int numOfTasks = 5; numOfTasks <= 15; numOfTasks += 2) {
+                for (int numOfTasks = 5; numOfTasks <= 15; numOfTasks += 1) {
                     loggerConsole.info("##### num of tasks = " + numOfTasks + " #####");
 
                     loggerExp_by_util.trace("\r\n\r\n#{} tasks per taskset", numOfTasks);
 
                     /* Utilization loop */
                     double cumulativePrecisionForNumOfTasks = 0;
+                    double cumulativePredictedTimeToSuccess = 0;
                     int cumulativeSuccessCount = 0;
                     for (double util = 0.001; util < 1; util += 0.1) {
                         loggerConsole.info("##### util = " + doubleToString(util) + " #####");
@@ -134,15 +139,15 @@ public class TestNewScheduLeak_TimeVsSuccessRate {
 
                             SingleNewScheduLeakTest singleNewScheduLeakTest = new SingleNewScheduLeakTest(taskSet, observer, victim);
                             singleNewScheduLeakTest.desiredConfidentLevel = 0.95;
-                            singleNewScheduLeakTest.run(simTimeByLcmPoPv);
+                            singleNewScheduLeakTest.run(0);
 
                             double inferencePrecision = singleNewScheduLeakTest.scheduLeak.inferencePrecision;
                             double successTimeByLcm = singleNewScheduLeakTest.scheduLeak.inferenceSuccessTime / lcm;
                             double successTimeByHpRatio = singleNewScheduLeakTest.scheduLeak.inferenceSuccessTime / (double) hyperPeriod;
-                            double analyticalConfidenceLevel = singleNewScheduLeakTest.scheduLeak.computeConfidenceLevelOverLcmPoPvTime(simTimeByLcmPoPv);
+                            //double analyticalConfidenceLevel = singleNewScheduLeakTest.scheduLeak.computeConfidenceLevelOverLcmPoPvTime(simTimeByLcmPoPv);
                             long predictedTimeToSuccess = singleNewScheduLeakTest.scheduLeak.computeLcmPoPvTimesByConfidenceLevel(0.95);
 
-                            //loggerExp_by_taskset.trace("util \t O \t precision \t simTimeByLcm \t successTimeByLcm \t successTimeByHpRatio \t predictedTimeToSuccess \t confidenceLevel");
+                            //loggerExp_by_taskset.trace("util \t O \t precision \t simTimeByLcm \t successTimeByLcm \t successTimeByHpRatio \t predictedTimeToSuccess");
                             loggerExp_by_taskset.trace("\r\n");
                             loggerExp_by_taskset.trace("{}\t", doubleToString(taskSet.getUtilization()));
                             loggerExp_by_taskset.trace("{}\t", doubleToString(observationRatio));
@@ -151,7 +156,7 @@ public class TestNewScheduLeak_TimeVsSuccessRate {
                             loggerExp_by_taskset.trace("{}\t", doubleToString(successTimeByLcm));
                             loggerExp_by_taskset.trace("{}\t", doubleToString(successTimeByHpRatio));
                             loggerExp_by_taskset.trace("{}\t", predictedTimeToSuccess);
-                            loggerExp_by_taskset.trace("{}\t", analyticalConfidenceLevel);
+                            //loggerExp_by_taskset.trace("{}\t", analyticalConfidenceLevel);
 
                             /* Success count and cumulative time */
                             if (singleNewScheduLeakTest.scheduLeak.inferencePrecision == 1.0) {
@@ -161,13 +166,15 @@ public class TestNewScheduLeak_TimeVsSuccessRate {
                             }
 
                             cumulativeInferencePrecision += singleNewScheduLeakTest.scheduLeak.inferencePrecision;
-                            cumulativeConfidenceLevel += analyticalConfidenceLevel;
+                            cumulativePredictedTimeToSuccess += predictedTimeToSuccess;
+                            //cumulativeConfidenceLevel += analyticalConfidenceLevel;
                         }/* Test per condition */
 
                         double averagePrecisionForUtil = cumulativeInferencePrecision / (double) NUM_OF_TEST_PER_CONDITION;
                         double averageSuccessTimeByLcm = successCount == 0 ? 0 : cumulativeSuccessTimeByLcm / (double) successCount;
                         double averageSuccessTimeByHpRatio = successCount == 0 ? 0 : cumulativeSuccessTimeByHpRatio / (double) successCount;
                         double successRate = successCount / (double) NUM_OF_TEST_PER_CONDITION;
+
 
                         //loggerExp_by_util.trace("util \t averagePrecision \t successRate \t averageSuccessTimeByLcm \t averageSuccessTimeByHpRatio");
                         loggerExp_by_util.trace("\r\n");
@@ -183,9 +190,13 @@ public class TestNewScheduLeak_TimeVsSuccessRate {
 
                     double averagePrecisionForeNumOfTasks = cumulativePrecisionForNumOfTasks / 10.0;
                     double successRate = cumulativeSuccessCount / (NUM_OF_TEST_PER_CONDITION * 10.0);
+                    double averagePredictedTimeToSuccess = cumulativePredictedTimeToSuccess / (NUM_OF_TEST_PER_CONDITION * 10.0);
 
-                    //loggerExp_by_exp_by_numOfTasksPerTaskset.trace("numOfTasks \t averagePrecision \t successRate");
-                    loggerExp_by_exp_by_numOfTasksPerTaskset.trace("\r\n{}\t{}\t{}", numOfTasks, doubleToString(averagePrecisionForeNumOfTasks), doubleToString(successRate));
+                    //loggerExp_by_exp_by_numOfTasksPerTaskset.trace("#numOfTasks \t averagePrecision \t successRate \t averagePredictedTimeToSuccess");
+                    loggerExp_by_exp_by_numOfTasksPerTaskset.trace("\r\n{}\t{}\t{}\t{}", numOfTasks, doubleToString(averagePrecisionForeNumOfTasks), doubleToString(successRate), doubleToString(averagePredictedTimeToSuccess));
+
+                    loggerExp_by_victimPriorityPrecision.trace("{}\t", doubleToString(averagePrecisionForeNumOfTasks));
+                    //loggerExp_by_victimPriorityTime.trace("{}\t", doubleToString(averageSuccessTimeForVictimPriority));
 
                     cumulativeSuccessCountBySimTime+= successRate;
                     cumulativePrecisionBySimTime+= averagePrecisionForeNumOfTasks;
@@ -197,9 +208,9 @@ public class TestNewScheduLeak_TimeVsSuccessRate {
             double averageSuccessRate = cumulativeSuccessCountBySimTime/(6.0*3.0);
             double averagePrecisionBySimTime = cumulativePrecisionBySimTime/(6.0*3.0);
 
-            //loggerExp_by_exp_by_timeVsSuccessRate.trace("#time \t AnalyticalSuccessRate \t trueSuccessRate \t averagePrecisionRatio");
+            //loggerExp_by_exp_by_timeVsSuccessRate.trace("#AnalyticalSuccessRate \t trueSuccessRate \t averagePrecisionRatio");
             loggerExp_by_exp_by_timeVsSuccessRate.trace("\r\n");
-            loggerExp_by_exp_by_timeVsSuccessRate.trace("{}\t", simTimeByLcmPoPv);
+            //loggerExp_by_exp_by_timeVsSuccessRate.trace("{}\t", simTimeByLcmPoPv);
             loggerExp_by_exp_by_timeVsSuccessRate.trace("{}\t", averageConfidenceLevel);
             loggerExp_by_exp_by_timeVsSuccessRate.trace("{}\t", averageSuccessRate);
             loggerExp_by_exp_by_timeVsSuccessRate.trace("{}\t", averagePrecisionBySimTime);
