@@ -5,6 +5,7 @@ import me.cychen.rts.event.SchedulerIntervalEvent;
 import me.cychen.rts.event.TaskInstantEvent;
 import me.cychen.rts.framework.Job;
 import me.cychen.rts.framework.Task;
+import me.cychen.util.Umath;
 
 import java.util.ArrayList;
 
@@ -159,14 +160,31 @@ public class QuickFixedPrioritySchedulerSimulator extends SchedulerSimulator {
             if (thisTask.getTaskType() == Task.TASK_TYPE_IDLE)
                 continue;
 
-            long thisPeriod = thisTask.getPeriod();
-            long thisOffset = thisTask.getInitialOffset();
-            for (long tick=thisOffset; tick<tickLimit; tick+=thisPeriod) {
-                //resultSimJobs.addNextEvent( new SimJob(thisTask, tick, thisTask.getComputationTimeNs()) );
-                resultSimJobs.add( new Job(thisTask, tick, getDeviatedExecutionTime(thisTask)) );
+            if (thisTask.isSporadicTask() == true) {
+                long thisOffset = thisTask.getInitialOffset();
+                long thisInterArrival = thisTask.getPeriod();
+                for (long tick = thisOffset; tick < tickLimit; tick += getVariedInterArrivalTime(thisInterArrival)) {
+                    //resultSimJobs.addNextEvent( new SimJob(thisTask, tick, thisTask.getComputationTimeNs()) );
+                    resultSimJobs.add(new Job(thisTask, tick, getDeviatedExecutionTime(thisTask)));
+                }
+            } else {
+                long thisPeriod = thisTask.getPeriod();
+                long thisOffset = thisTask.getInitialOffset();
+                for (long tick = thisOffset; tick < tickLimit; tick += thisPeriod) {
+                    //resultSimJobs.addNextEvent( new SimJob(thisTask, tick, thisTask.getComputationTimeNs()) );
+                    resultSimJobs.add(new Job(thisTask, tick, getDeviatedExecutionTime(thisTask)));
+                }
             }
         }
         return resultSimJobs;
+    }
+
+    public long getVariedInterArrivalTime(long minInterArrival) {
+        long result = 0;
+        while (result < minInterArrival) {
+            result = Umath.getPoisson((minInterArrival/10)*1.2)*10;
+        }
+        return result;
     }
 
     public void simJobs(QuickFPSchedulerJobContainer jobContainer) {

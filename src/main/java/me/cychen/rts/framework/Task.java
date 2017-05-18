@@ -35,6 +35,8 @@ public class Task {
     /* Parameters for Simulation */
     protected long nextReleaseTime = 0;
 
+    protected boolean isSporadicTask = false;
+
     public Task(){}
 
     public Task(int inTaskId, String inTitle, int inType, long inPeriod, long inDeadline, long inExecTime, int inPriority)
@@ -52,6 +54,14 @@ public class Task {
     //    cloneSettings(inTask);
     //}
 
+
+    public boolean isSporadicTask() {
+        return isSporadicTask;
+    }
+
+    public void setSporadicTask(boolean sporadicTask) {
+        isSporadicTask = sporadicTask;
+    }
 
     public void setId(int id) {
         this.id = id;
